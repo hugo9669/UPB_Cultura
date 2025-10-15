@@ -1,39 +1,41 @@
-import { Router } from "express";
+import express, { Router } from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { requireAuth } from "../config/passport.js";
+import { requireAuth, requireCoordinator } from "../config/passport.js";
 import { uploadMediaCtrl } from "../controllers/media.js";
+import { ensureUploadsDir, validateFileType, generateUniqueFilename } from "../services/media.js";
 
 // Configuración de Multer con almacenamiento local en /uploads
-const uploadsDir = path.resolve("uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+const uploadsDir = ensureUploadsDir();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => {
-    const unique = Date.now() + "-" + Math.round(Math.random()*1e9);
-    const ext = path.extname(file.originalname || "");
-    cb(null, unique + ext);
+    const uniqueFilename = generateUniqueFilename(file.originalname);
+    cb(null, uniqueFilename);
   }
 });
 
-// Validación básica de tipo y tamaño (ejemplo: 5MB)
+// Validación de archivos (solo imágenes, máximo 5MB)
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
-    // TODO: ampliar validaciones (solo imágenes, etc.)
-    cb(null, true);
+    if (validateFileType(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos de imagen (JPEG, PNG, GIF, WebP)'), false);
+    }
   }
 });
 
 const r = Router();
 
-// Subida de media (restringido a usuarios autenticados)
-r.post("/upload", requireAuth, upload.single("file"), uploadMediaCtrl);
+// Subida de media (restringido a coordinadores y admins)
+r.post("/upload", requireAuth, requireCoordinator, upload.single("file"), uploadMediaCtrl);
 
-// Nota: Servir /uploads por Nginx u otra capa. En dev, puedes usar express.static si deseas.
-// app.use("/uploads", express.static(path.resolve("uploads"))) en app.js (si lo habilitas).
+// Servir archivos estáticos (para desarrollo)
+r.use("/uploads", express.static(uploadsDir));
 
 export default r;

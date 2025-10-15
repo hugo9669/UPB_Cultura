@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 export function useCarousel(items: any[], autoPlay = true, interval = 5000) {
   const currentIndex = ref(0)
   const isPlaying = ref(autoPlay)
-  let intervalId: number | null = null
+  let intervalId: NodeJS.Timeout | null = null
 
   const next = () => {
     currentIndex.value = (currentIndex.value + 1) % items.length

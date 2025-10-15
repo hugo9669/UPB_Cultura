@@ -104,10 +104,23 @@
         <!-- Credenciales de prueba -->
         <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
           <h4 class="text-sm font-medium text-yellow-800 mb-2">Credenciales de Prueba:</h4>
-          <p class="text-xs text-yellow-700">
-            <strong>Email:</strong> admin@upb.edu.co<br>
-            <strong>Contraseña:</strong> admin123
-          </p>
+          <div class="space-y-2 text-xs text-yellow-700">
+            <div>
+              <strong>👤 Usuario:</strong><br>
+              Email: hugo.hernandezm@upb.edu.co<br>
+              Contraseña: hahm2006
+            </div>
+            <div class="border-t border-yellow-300 pt-2">
+              <strong>🎭 Líder Cultural:</strong><br>
+              Email: juan.canon@upb.edu.co<br>
+              Contraseña: 12345678
+            </div>
+            <div class="border-t border-yellow-300 pt-2">
+              <strong>👑 Administrador:</strong><br>
+              Email: cesar.rodriguez@upb.edu.co<br>
+              Contraseña: hola1234
+            </div>
+          </div>
         </div>
       </form>
     </div>
@@ -183,16 +196,25 @@ const handleLogin = async () => {
   isLoading.value = true
 
   try {
-    // Simular delay de autenticación
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const result = await authStore.login(form.email, form.password)
     
-    const success = authStore.login(form.email, form.password)
-    
-    if (success) {
+    if (result.success) {
       showNotification('¡Inicio de sesión exitoso!', 'success')
-      router.push('/dashboard')
+      
+      // Redirigir según el rol del usuario
+      const userRole = authStore.user?.role
+      
+      if (userRole === 'administrador') {
+        router.push('/admin')
+      } else if (userRole === 'usuario') {
+        router.push('/usuario')
+      } else if (userRole === 'Lcultural') {
+        router.push('/lider')
+      } else {
+        router.push('/dashboard')
+      }
     } else {
-      showNotification('Credenciales incorrectas', 'error')
+      showNotification(result.error || 'Credenciales incorrectas', 'error')
     }
   } catch (error) {
     showNotification('Error al iniciar sesión', 'error')

@@ -1,15 +1,33 @@
-// Modelo de usuarios
-// TODO: Ajustar tableName/campos para que coincidan con tu BD real si difieren.
+// Modelo de Usuarios
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
 
 export const User = sequelize.define("User", {
-  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
-  username: { type: DataTypes.STRING(60), allowNull: false, unique: true },
-  email: { type: DataTypes.STRING(120), allowNull: false, unique: true },
-  fullName: { type: DataTypes.STRING(120), allowNull: true },
-  passwordHash: { type: DataTypes.STRING, allowNull: true }, // null si el usuario es solo SSO
-  role: { type: DataTypes.ENUM("admin", "coordinator", "leader", "member", "student"), defaultValue: "student" }
+  id: { 
+    type: DataTypes.INTEGER, 
+    primaryKey: true, 
+    autoIncrement: true,
+    field: "ID"
+  },
+  nombre: { 
+    type: DataTypes.TEXT, 
+    allowNull: false
+  },
+  correo: { 
+    type: DataTypes.TEXT, 
+    allowNull: false,
+    unique: true
+  },
+  contrasena: { 
+    type: DataTypes.TEXT, 
+    allowNull: false
+  },
+  idRol: { 
+    type: DataTypes.INTEGER, 
+    allowNull: false,
+    field: "Id_rol"
+  }
 }, {
-  tableName: "users"
+  tableName: "Usuarios",
+  timestamps: false
 });

@@ -11,8 +11,8 @@
         <h1 class="text-xl md:text-2xl font-bold text-gray-900">UPB Cultura</h1>
       </RouterLink>
 
-      <!-- Barra de navegación (Desktop) -->
-      <nav class="hidden md:flex items-center space-x-8">
+      <!-- Barra de navegación (Desktop) - Solo administradores -->
+      <nav v-if="authStore.isAdmin" class="hidden md:flex items-center space-x-8">
         <RouterLink 
           to="/eventos" 
           class="nav-link text-gray-600 hover:text-blue-600 transition duration-300 font-medium"
@@ -46,7 +46,9 @@
       <!-- Botón de acción -->
       <div class="flex items-center space-x-4">
         <template v-if="authStore.isLoggedIn">
+          <!-- Dashboard solo visible para administradores -->
           <RouterLink 
+            v-if="authStore.isAdmin"
             to="/dashboard" 
             class="bg-green-600 text-white px-4 py-2 rounded-full font-medium hover:bg-green-700 transition duration-300 shadow-lg"
           >
@@ -68,8 +70,9 @@
           </RouterLink>
         </template>
 
-        <!-- Menú móvil -->
+        <!-- Menú móvil - Solo administradores -->
         <button 
+          v-if="authStore.isAdmin"
           @click="toggleMobileMenu"
           class="md:hidden p-2 text-gray-600 hover:text-blue-600"
         >
@@ -80,8 +83,8 @@
       </div>
     </div>
 
-    <!-- Menú móvil -->
-    <div v-if="isMobileMenuOpen" class="md:hidden bg-white border-t border-gray-200">
+    <!-- Menú móvil - Solo administradores -->
+    <div v-if="isMobileMenuOpen && authStore.isAdmin" class="md:hidden bg-white border-t border-gray-200">
       <div class="px-4 py-2 space-y-2">
         <RouterLink 
           to="/eventos" 

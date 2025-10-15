@@ -56,6 +56,27 @@ export function passportInit(app) {
 
 export const requireAuth = passport.authenticate("jwt", { session: false });
 
+// Middleware de autorización por roles
+export const requireRole = (roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'No autenticado' });
+    }
+    
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Acceso denegado. Rol insuficiente.' });
+    }
+    
+    next();
+  };
+};
+
+// Middleware específico para coordinadores
+export const requireCoordinator = requireRole(['coordinator', 'admin']);
+
+// Middleware específico para administradores
+export const requireAdmin = requireRole(['admin']);
+
 // Helper para redirigir al Front después del SSO con el token como query param
 export function redirectWithToken(res, token) {
   // TODO: si prefieres cookie HttpOnly, setear aquí en lugar de query

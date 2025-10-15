@@ -23,10 +23,10 @@ const authStore = useAuthStore()
 const eventsStore = useEventsStore()
 const groupsStore = useGroupsStore()
 
-onMounted(() => {
+onMounted(async () => {
   // Inicializar stores
   authStore.initializeAuth()
-  eventsStore.initializeEvents()
-  groupsStore.initializeGroups()
+  await eventsStore.initializeEvents()
+  await groupsStore.initializeGroups()
 })
 </script>

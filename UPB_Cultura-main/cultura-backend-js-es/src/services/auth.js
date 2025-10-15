@@ -1,6 +1,6 @@
 // Lógica de autenticación (registro/login dev). En producción usar SSO.
 import bcrypt from "bcryptjs";
-import { User } from "../models/index.js";
+import { User, Role } from "../models/index.js";
 import { signToken } from "../utils/jwt.js";
 
 export async function register({ username, email, fullName, password }) {
@@ -13,11 +13,61 @@ export async function register({ username, email, fullName, password }) {
   return { id: user.id, username: user.username, email: user.email, fullName: user.fullName };
 }
 
-export async function login({ username, password }) {
-  const user = await User.findOne({ where: { username } });
-  if (!user || !user.passwordHash) throw new Error("Credenciales inválidas");
-  const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) throw new Error("Credenciales inválidas");
-  const token = signToken(user.id, { username: user.username, role: user.role });
-  return { access_token: token, token_type: "bearer" };
+export async function login({ email, password }) {
+  try {
+    console.log(`🔍 Intentando login para: ${email}`);
+    
+    // Buscar usuario por email con su rol
+    const user = await User.findOne({ 
+      where: { correo: email },
+      include: [{ model: Role, as: "rol" }]
+    });
+    
+    console.log(`👤 Usuario encontrado:`, user ? 'Sí' : 'No');
+    
+    if (!user) {
+      console.log(`❌ Usuario no encontrado para email: ${email}`);
+      throw new Error("Usuario no encontrado");
+    }
+    
+    if (!user.contrasena) {
+      console.log(`❌ Usuario sin contraseña para email: ${email}`);
+      throw new Error("Usuario sin contraseña configurada");
+    }
+    
+    // Comparar contraseña
+    const ok = await bcrypt.compare(password, user.contrasena);
+    console.log(`🔐 Contraseña válida:`, ok ? 'Sí' : 'No');
+    
+    if (!ok) {
+      console.log(`❌ Contraseña incorrecta para email: ${email}`);
+      throw new Error("Contraseña incorrecta");
+    }
+    
+    // Obtener el nombre del rol
+    const roleName = user.rol?.nombreRol || "usuario";
+    console.log(`🎭 Rol del usuario: ${roleName}`);
+    
+    // Crear token con el rol
+    const token = signToken(user.id, { 
+      nombre: user.nombre, 
+      correo: user.correo,
+      role: roleName 
+    });
+    
+    console.log(`✅ Login exitoso para: ${email}`);
+    
+    return { 
+      token,
+      user: {
+        id: user.id,
+        email: user.correo,
+        name: user.nombre,
+        role: roleName
+      }
+    };
+  } catch (error) {
+    console.log(`❌ Error en login para ${email}:`, error.message);
+    throw error;
+  }
 }

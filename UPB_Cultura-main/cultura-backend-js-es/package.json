@@ -6,7 +6,18 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seed": "node scripts/createTestData.js",
+    "test:db": "node scripts/testConnection.js",
+    "test:models": "node scripts/testModels.js",
+    "hash-passwords": "node scripts/hashPasswords.js",
+    "check-env": "node scripts/checkEnv.js",
+    "update-cors": "node scripts/updateCors.js",
+    "diagnose": "node scripts/diagnose.js",
+    "test-login": "node scripts/testLogin.js",
+    "test-new-user": "node scripts/testNewUser.js",
+    "check-user": "node scripts/checkUser.js",
+    "hash-user-password": "node scripts/hashUserPassword.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -25,6 +36,7 @@
     "passport-oauth2": "^1.8.0",
     "pg": "^8.11.5",
     "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

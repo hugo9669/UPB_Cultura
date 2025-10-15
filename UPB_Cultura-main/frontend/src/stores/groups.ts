@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { apiService, handleApiError } from '@/services/api'
 
 export interface Group {
   id: string
@@ -18,6 +19,8 @@ export const useGroupsStore = defineStore('groups', () => {
   const groups = ref<Group[]>([])
   const searchTerm = ref('')
   const selectedCategory = ref('')
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
 
   // Grupos de ejemplo
   const sampleGroups: Group[] = [
@@ -95,13 +98,27 @@ export const useGroupsStore = defineStore('groups', () => {
     }
   ]
 
-  const initializeGroups = () => {
-    const storedGroups = localStorage.getItem('groups')
-    if (storedGroups) {
-      groups.value = JSON.parse(storedGroups)
-    } else {
-      groups.value = sampleGroups
-      saveGroups()
+  const initializeGroups = async () => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.getGroups()
+      if (response.data) {
+        groups.value = response.data
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      // Fallback a datos locales si hay error de conexión
+      const storedGroups = localStorage.getItem('groups')
+      if (storedGroups) {
+        groups.value = JSON.parse(storedGroups)
+      } else {
+        groups.value = sampleGroups
+        saveGroups()
+      }
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -109,26 +126,66 @@ export const useGroupsStore = defineStore('groups', () => {
     localStorage.setItem('groups', JSON.stringify(groups.value))
   }
 
-  const addGroup = (group: Omit<Group, 'id'>) => {
-    const newGroup: Group = {
-      ...group,
-      id: Date.now().toString()
+  const addGroup = async (group: Omit<Group, 'id'>): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.createGroup(group)
+      if (response.data) {
+        groups.value.push(response.data)
+        saveGroups()
+        return { success: true }
+      } else {
+        return { success: false, error: 'Error al crear el grupo' }
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
     }
-    groups.value.push(newGroup)
-    saveGroups()
   }
 
-  const updateGroup = (id: string, updatedGroup: Partial<Group>) => {
-    const index = groups.value.findIndex(group => group.id === id)
-    if (index !== -1) {
-      groups.value[index] = { ...groups.value[index], ...updatedGroup }
+  const updateGroup = async (id: string, updatedGroup: Partial<Group>): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.updateGroup(id, updatedGroup)
+      if (response.data) {
+        const index = groups.value.findIndex(group => group.id === id)
+        if (index !== -1) {
+          groups.value[index] = response.data
+          saveGroups()
+        }
+        return { success: true }
+      } else {
+        return { success: false, error: 'Error al actualizar el grupo' }
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const deleteGroup = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      await apiService.deleteGroup(id)
+      groups.value = groups.value.filter(group => group.id !== id)
       saveGroups()
+      return { success: true }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
     }
-  }
-
-  const deleteGroup = (id: string) => {
-    groups.value = groups.value.filter(group => group.id !== id)
-    saveGroups()
   }
 
   const addPhotoToGroup = (groupId: string, photoUrl: string) => {
@@ -176,6 +233,8 @@ export const useGroupsStore = defineStore('groups', () => {
     groups,
     searchTerm,
     selectedCategory,
+    isLoading,
+    error,
     filteredGroups,
     categories,
     initializeGroups,

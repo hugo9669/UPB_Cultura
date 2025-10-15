@@ -1,16 +1,25 @@
-// Conexión Sequelize a PostgreSQL (no hace sync de modelos).
+// Conexión Sequelize a PostgreSQL
 import { Sequelize } from "sequelize";
-import { DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER, NODE_ENV } from "../config/env.js";
+import { NODE_ENV, DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS } from "../config/env.js";
 
-export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
-  host: DB_HOST,
-  port: Number(DB_PORT),
+export const sequelize = new Sequelize({
   dialect: "postgres",
-  logging: NODE_ENV === "development" ? false : false,
+  host: DB_HOST,
+  port: parseInt(DB_PORT),
+  database: DB_NAME,
+  username: DB_USER,
+  password: DB_PASS,
+  logging: NODE_ENV === "development" ? console.log : false,
   define: {
-    // TODO: Configura según tu esquema real si usas snake_case y/o no manejas timestamps.
-    // underscored: true,
-    // timestamps: false,
-    // freezeTableName: true
+    // Configuración para PostgreSQL
+    underscored: true,
+    timestamps: true,
+    freezeTableName: true
+  },
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
   }
 });

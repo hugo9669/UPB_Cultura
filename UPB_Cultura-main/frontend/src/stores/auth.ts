@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { apiService, handleApiError } from '@/services/api'
 
 export interface User {
   id: string
   email: string
   name: string
-  role: 'admin' | 'coordinator'
+  role: 'administrador' | 'usuario' | 'Lcultural'
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -13,33 +14,43 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = ref(false)
   const jwt = ref<string | null>(null)
 
-  const login = (email: string, password: string): boolean => {
-    // Simular autenticación
-    if (email === 'admin@upb.edu.co' && password === 'admin123') {
-      user.value = {
-        id: '1',
-        email: email,
-        name: 'Coordinador de Cultura',
-        role: 'coordinator'
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await apiService.login(email, password)
+      
+      if (response.data?.token && response.data?.user) {
+        user.value = response.data.user
+        isLoggedIn.value = true
+        jwt.value = response.data.token
+        
+        // Guardar en localStorage
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('userData', JSON.stringify(user.value))
+        localStorage.setItem('token', response.data.token)
+        
+        return { success: true }
+      } else {
+        return { success: false, error: 'Credenciales incorrectas' }
       }
-      isLoggedIn.value = true
-      
-      // Guardar en localStorage
-      localStorage.setItem('isLoggedIn', 'true')
-      localStorage.setItem('userData', JSON.stringify(user.value))
-      
-      return true
+    } catch (error: any) {
+      return { success: false, error: handleApiError(error) }
     }
-    return false
   }
 
-  const logout = () => {
-    user.value = null
-    isLoggedIn.value = false
-    jwt.value = null
-    localStorage.removeItem('isLoggedIn')
-    localStorage.removeItem('userData')
-    localStorage.removeItem('token')
+  const logout = async () => {
+    try {
+      await apiService.logout()
+    } catch (error) {
+      // Ignorar errores de logout en el servidor
+      console.warn('Error al hacer logout en el servidor:', error)
+    } finally {
+      user.value = null
+      isLoggedIn.value = false
+      jwt.value = null
+      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('userData')
+      localStorage.removeItem('token')
+    }
   }
 
   const initializeAuth = () => {
@@ -47,17 +58,34 @@ export const useAuthStore = defineStore('auth', () => {
     const storedUser = localStorage.getItem('userData')
     const storedToken = localStorage.getItem('token')
     
-    if (storedAuth === 'true' && storedUser) {
-      isLoggedIn.value = true
-      user.value = JSON.parse(storedUser)
-    }
-
-    if (storedToken) {
-      jwt.value = storedToken
-      // Si solo hay token, considera al usuario logueado a nivel de token
-      if (!isLoggedIn.value) {
-        isLoggedIn.value = true
+    // Solo inicializar si hay TODOS los datos necesarios
+    if (storedAuth === 'true' && storedUser && storedToken) {
+      // Validación básica de forma de JWT (tres segmentos)
+      const looksLikeJwt = storedToken.split('.').length === 3
+      if (!looksLikeJwt) {
+        console.log('⚠️ Token inválido en localStorage, limpiando...')
+        logout()
+        return
       }
+      try {
+        const userData = JSON.parse(storedUser)
+        // Verificar que el usuario tiene los campos necesarios
+        const validRole = ['administrador','usuario','Lcultural'].includes(userData?.role)
+        if (userData && userData.id && userData.email && validRole) {
+          isLoggedIn.value = true
+          user.value = userData
+          jwt.value = storedToken
+          console.log('✅ Usuario autenticado desde localStorage:', userData.name)
+        } else {
+          console.log('⚠️ Datos de usuario inválidos, limpiando...')
+          logout()
+        }
+      } catch (error) {
+        console.log('⚠️ Error al parsear datos de usuario, limpiando...')
+        logout()
+      }
+    } else {
+      console.log('ℹ️ No hay datos de autenticación válidos')
     }
   }
 
@@ -83,15 +111,17 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const isAdmin = computed(() => user.value?.role === 'admin')
-  const isCoordinator = computed(() => user.value?.role === 'coordinator')
+  const isAdmin = computed(() => user.value?.role === 'administrador')
+  const isUsuario = computed(() => user.value?.role === 'usuario')
+  const isLider = computed(() => user.value?.role === 'Lcultural')
 
   return {
     user,
     isLoggedIn,
     jwt,
     isAdmin,
-    isCoordinator,
+    isUsuario,
+    isLider,
     login,
     logout,
     initializeAuth,

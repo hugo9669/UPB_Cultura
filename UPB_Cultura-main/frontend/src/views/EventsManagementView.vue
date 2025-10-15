@@ -107,6 +107,25 @@
               </select>
             </div>
             
+            <!-- ✅ Campo de selección de grupo -->
+            <div>
+              <label for="event-group" class="block text-sm font-medium text-gray-700 mb-1">
+                Grupo Cultural
+              </label>
+              <select
+                id="event-group"
+                v-model="eventForm.groupId"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+                :class="{ 'border-red-500': errors.groupId }"
+              >
+                <option value="">Selecciona un grupo</option>
+                <option v-for="group in availableGroups" :key="group.id" :value="group.id">
+                  {{ group.name }} ({{ group.category }})
+                </option>
+              </select>
+              <p v-if="errors.groupId" class="mt-1 text-sm text-red-600">{{ errors.groupId }}</p>
+            </div>
+            
             <button
               type="submit"
               :disabled="isSaving"
@@ -239,11 +258,21 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useEventsStore } from '../stores/events'
+import { useGroupsStore } from '../stores/groups'
 import { useNotifications } from '../composables/useNotifications'
 import type { Event } from '../stores/events'
 
 const eventsStore = useEventsStore()
+const groupsStore = useGroupsStore()
 const { showNotification } = useNotifications()
+
+// Cargar grupos disponibles
+const availableGroups = ref([])
+
+onMounted(async () => {
+  await groupsStore.initializeGroups()
+  availableGroups.value = groupsStore.groups
+})
 
 const eventForm = reactive({
   name: '',
@@ -251,7 +280,8 @@ const eventForm = reactive({
   date: '',
   time: '',
   location: '',
-  category: ''
+  category: '',
+  groupId: '' // ✅ Agregar selección de grupo
 })
 
 const errors = reactive({
@@ -259,7 +289,8 @@ const errors = reactive({
   description: '',
   date: '',
   time: '',
-  location: ''
+  location: '',
+  groupId: '' // ✅ Agregar validación para grupo
 })
 
 const isSaving = ref(false)
@@ -299,6 +330,12 @@ const validateForm = () => {
     isValid = false
   }
 
+  // ✅ Validar que se seleccione un grupo
+  if (!eventForm.groupId) {
+    errors.groupId = 'Debe seleccionar un grupo cultural'
+    isValid = false
+  }
+
   return isValid
 }
 
@@ -322,19 +359,32 @@ const saveEvent = async () => {
       image: 'https://placehold.co/600x400/1a202c/ffffff?text=Evento'
     }
 
+    let result: { success: boolean; error?: string }
+    
     if (editingEvent.value) {
-      eventsStore.updateEvent(editingEvent.value.id, eventData)
-      showNotification('Evento actualizado exitosamente', 'success')
-      editingEvent.value = null
+      result = await eventsStore.updateEvent(editingEvent.value.id, eventData)
+      if (result.success) {
+        showNotification('Evento actualizado exitosamente', 'success')
+        editingEvent.value = null
+      } else {
+        showNotification(result.error || 'Error al actualizar el evento', 'error')
+      }
     } else {
-      eventsStore.addEvent(eventData)
-      showNotification('Evento creado exitosamente', 'success')
+      // ✅ Usar el groupId seleccionado para crear el evento
+      result = await eventsStore.addEvent(eventData, eventForm.groupId)
+      if (result.success) {
+        showNotification('Evento creado exitosamente', 'success')
+      } else {
+        showNotification(result.error || 'Error al crear el evento', 'error')
+      }
     }
 
-    // Limpiar formulario
-    Object.keys(eventForm).forEach(key => {
-      eventForm[key as keyof typeof eventForm] = ''
-    })
+    // Limpiar formulario solo si fue exitoso
+    if (result.success) {
+      Object.keys(eventForm).forEach(key => {
+        eventForm[key as keyof typeof eventForm] = ''
+      })
+    }
 
   } catch (error) {
     showNotification('Error al guardar el evento', 'error')
@@ -357,10 +407,14 @@ const editEvent = (event: Event) => {
   showNotification('Evento cargado para edición', 'info')
 }
 
-const deleteEvent = (eventId: string) => {
+const deleteEvent = async (eventId: string) => {
   if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
-    eventsStore.deleteEvent(eventId)
-    showNotification('Evento eliminado exitosamente', 'success')
+    const result = await eventsStore.deleteEvent(eventId)
+    if (result.success) {
+      showNotification('Evento eliminado exitosamente', 'success')
+    } else {
+      showNotification(result.error || 'Error al eliminar el evento', 'error')
+    }
   }
 }
 
