@@ -21,4 +21,7 @@ export const Role = sequelize.define("Role", {
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628

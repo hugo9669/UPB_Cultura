@@ -4,6 +4,7 @@ import {
   Role, 
   Group, 
   Category, 
+<<<<<<< HEAD
   Membership,
   MembershipRequest,
   Event, 
@@ -12,6 +13,13 @@ import {
   Comment,
   Message,
   UserMessage
+=======
+  Membership, 
+  Event, 
+  Publication, 
+  Repertorio, 
+  Comment 
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 } from "../models/index.js";
 
 // Relaciones User - Role
@@ -52,6 +60,7 @@ Comment.belongsTo(Publication, { foreignKey: "idPublicacion", as: "publicacion" 
 User.hasMany(Comment, { foreignKey: "idUsuario", as: "comentarios" });
 Event.hasMany(Comment, { foreignKey: "idEvento", as: "comentarios" });
 Publication.hasMany(Comment, { foreignKey: "idPublicacion", as: "comentarios" });
+<<<<<<< HEAD
 
 // Relaciones Message - Group
 Message.belongsTo(Group, { foreignKey: "idGrupo", as: "grupo" });
@@ -76,3 +85,5 @@ MembershipRequest.belongsTo(User, { foreignKey: "idUsuario", as: "usuario" });
 MembershipRequest.belongsTo(Group, { foreignKey: "idGrupo", as: "grupo" });
 User.hasMany(MembershipRequest, { foreignKey: "idUsuario", as: "solicitudesMembresia" });
 Group.hasMany(MembershipRequest, { foreignKey: "idGrupo", as: "solicitudesMembresia" });
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628

@@ -5,7 +5,10 @@ export const createGroupSchema = Joi.object({
   category: Joi.string().min(2).max(60).required(),
   description: Joi.string().allow(null, "").optional(),
   logoUrl: Joi.string().uri().allow(null, "").optional(),
+<<<<<<< HEAD
   leaderId: Joi.number().integer().positive().required(),  // ID del líder del grupo
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   // Campos adicionales para compatibilidad con frontend
   image: Joi.string().uri().allow(null, "").optional(),
   categoryColor: Joi.string().max(20).optional(),

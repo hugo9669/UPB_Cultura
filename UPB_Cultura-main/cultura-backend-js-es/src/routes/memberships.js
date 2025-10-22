@@ -25,4 +25,9 @@ r.post("/:groupId/join", requireAuth, joinGroupCtrl);     // unirse a un grupo
 r.delete("/:groupId/leave", requireAuth, leaveGroupCtrl); // salir de un grupo
 r.get("/my-memberships", requireAuth, getUserMembershipsCtrl); // obtener membresías del usuario
 
+// Nuevas rutas para funcionalidad de unirse/salir de grupos
+r.post("/:groupId/join", requireAuth, joinGroupCtrl);     // unirse a un grupo
+r.delete("/:groupId/leave", requireAuth, leaveGroupCtrl); // salir de un grupo
+r.get("/my-memberships", requireAuth, getUserMembershipsCtrl); // obtener membresías del usuario
+
 export default r;

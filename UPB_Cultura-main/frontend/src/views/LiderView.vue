@@ -6,13 +6,18 @@
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-3xl font-bold text-gray-900">Panel de Líder Cultural</h1>
+<<<<<<< HEAD
             <p class="text-gray-600 mt-1">{{ myGroup ? `Gestiona ${myGroup.name}` : 'Cargando...' }}</p>
+=======
+            <p class="text-gray-600 mt-1">Gestiona tu grupo cultural</p>
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
           </div>
           <div class="flex items-center gap-4">
             <div class="text-right">
               <p class="text-sm text-gray-600">Bienvenido</p>
               <p class="font-semibold text-gray-900">{{ user?.name }}</p>
             </div>
+<<<<<<< HEAD
             <router-link
               to="/"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2"
@@ -22,6 +27,8 @@
               </svg>
               Inicio
             </router-link>
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             <button
               @click="handleLogout"
               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
@@ -34,6 +41,7 @@
     </div>
 
     <!-- Contenido Principal -->
+<<<<<<< HEAD
     <div v-if="loading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="text-center py-12">
         <p class="text-gray-600">Cargando información...</p>
@@ -77,13 +85,20 @@
         </div>
       </div>
 
+=======
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
       <!-- Estadísticas del Grupo -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-600 text-sm font-semibold">Miembros</p>
+<<<<<<< HEAD
               <p class="text-3xl font-bold text-blue-700 mt-2">{{ members.length }}</p>
+=======
+              <p class="text-3xl font-bold text-blue-700 mt-2">{{ groupStats.members }}</p>
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             </div>
             <div class="bg-blue-100 p-3 rounded-full">
               <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +112,11 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-600 text-sm font-semibold">Eventos</p>
+<<<<<<< HEAD
               <p class="text-3xl font-bold text-green-700 mt-2">{{ groupEvents.length }}</p>
+=======
+              <p class="text-3xl font-bold text-green-700 mt-2">{{ groupStats.events }}</p>
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             </div>
             <div class="bg-green-100 p-3 rounded-full">
               <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,12 +129,21 @@
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="flex items-center justify-between">
             <div>
+<<<<<<< HEAD
               <p class="text-gray-600 text-sm font-semibold">Próximos Eventos</p>
               <p class="text-3xl font-bold text-purple-700 mt-2">{{ upcomingEvents.length }}</p>
             </div>
             <div class="bg-purple-100 p-3 rounded-full">
               <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+=======
+              <p class="text-gray-600 text-sm font-semibold">Publicaciones</p>
+              <p class="text-3xl font-bold text-purple-700 mt-2">{{ groupStats.posts }}</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-full">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
               </svg>
             </div>
           </div>
@@ -126,10 +154,14 @@
       <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Acciones Rápidas</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<<<<<<< HEAD
           <button
             @click="showCreateEventModal = true"
             class="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300"
           >
+=======
+          <button class="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             <div class="bg-blue-100 p-3 rounded-full">
               <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -138,10 +170,23 @@
             <span class="text-sm font-medium text-gray-900">Crear Evento</span>
           </button>
 
+<<<<<<< HEAD
           <button
             @click="showMembersModal = true"
             class="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300"
           >
+=======
+          <button class="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300">
+            <div class="bg-green-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-gray-900">Nueva Publicación</span>
+          </button>
+
+          <button class="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             <div class="bg-purple-100 p-3 rounded-full">
               <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -150,6 +195,7 @@
             <span class="text-sm font-medium text-gray-900">Gestionar Miembros</span>
           </button>
 
+<<<<<<< HEAD
           <button
             @click="showEditGroupModal = true"
             class="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300"
@@ -230,11 +276,22 @@
               <p class="text-xs text-gray-500">{{ member.User?.email }}</p>
             </div>
           </div>
+=======
+          <button class="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300">
+            <div class="bg-yellow-100 p-3 rounded-full">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-gray-900">Ver Estadísticas</span>
+          </button>
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
         </div>
       </div>
 
       <!-- Eventos Próximos -->
       <div class="bg-white rounded-lg shadow-md p-6">
+<<<<<<< HEAD
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold text-gray-900">Próximos Eventos del Grupo</h2>
           <button
@@ -244,16 +301,23 @@
             Crear Evento
           </button>
         </div>
+=======
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Próximos Eventos del Grupo</h2>
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
         
         <div v-if="groupEvents.length === 0" class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <p class="mt-4 text-gray-600">No hay eventos programados</p>
+<<<<<<< HEAD
           <button
             @click="showCreateEventModal = true"
             class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
           >
+=======
+          <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             Crear Primer Evento
           </button>
         </div>
@@ -265,6 +329,7 @@
             class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-300"
           >
             <div class="flex items-start justify-between">
+<<<<<<< HEAD
               <div class="flex gap-4 flex-1">
                 <img :src="event.image" :alt="event.name" class="w-20 h-20 rounded-lg object-cover">
                 <div class="flex-1">
@@ -288,6 +353,20 @@
                   @click="deleteEvent(event.id)"
                   class="text-red-600 hover:text-red-700 text-sm font-medium"
                 >
+=======
+              <div class="flex-1">
+                <h3 class="font-semibold text-lg text-gray-900">{{ event.title }}</h3>
+                <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                  <span>{{ formatDate(event.date) }}</span>
+                  <span>{{ event.location }}</span>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  Editar
+                </button>
+                <button class="text-red-600 hover:text-red-700 text-sm font-medium">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
                   Eliminar
                 </button>
               </div>
@@ -296,6 +375,7 @@
         </div>
       </div>
     </div>
+<<<<<<< HEAD
 
     <!-- Modal: Crear/Editar Evento -->
     <div v-if="showCreateEventModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1585,22 +1665,31 @@
         </div>
       </div>
     </div>
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   </div>
 </template>
 
 <script setup lang="ts">
+<<<<<<< HEAD
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { apiService } from '@/services/api'
 import type { FrontendGroup, FrontendEvent } from '@/utils/adapters'
 import EventCalendar from '@/components/EventCalendar.vue'
+=======
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const user = computed(() => authStore.user)
 
+<<<<<<< HEAD
 // Estado
 const loading = ref(true)
 const myGroup = ref<FrontendGroup | null>(null)
@@ -2101,12 +2190,32 @@ const submitGroupUpdate = async () => {
   } finally {
     savingGroup.value = false
   }
+=======
+const groupStats = ref({
+  members: 0,
+  events: 0,
+  posts: 0
+})
+
+const groupEvents = ref([
+  // Aquí se cargarían los eventos del grupo desde la API
+])
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 }
 
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
 }
+<<<<<<< HEAD
 
 // Gestión de mensajes
 const loadMessages = async () => {
@@ -2468,3 +2577,9 @@ watch(showReceivedMessagesModal, (newValue) => {
   }
 })
 </script>
+=======
+</script>
+
+
+
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628

@@ -10,10 +10,13 @@ export const sequelize = new Sequelize({
   username: DB_USER,
   password: DB_PASS,
   logging: NODE_ENV === "development" ? console.log : false,
+<<<<<<< HEAD
   timezone: '-05:00', // Zona horaria de Colombia (UTC-5) para mantener consistencia
   dialectOptions: {
     useUTC: false, // NO convertir a UTC, mantener zona horaria local
   },
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   define: {
     // Configuración para PostgreSQL
     underscored: true,

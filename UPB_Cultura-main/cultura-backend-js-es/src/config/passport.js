@@ -80,6 +80,7 @@ export const requireRole = (roles) => {
 };
 
 // Middleware específico para coordinadores
+<<<<<<< HEAD
 export const requireCoordinator = requireRole(['coordinator', 'admin', 'administrador']);
 
 // Middleware específico para administradores
@@ -87,6 +88,12 @@ export const requireAdmin = requireRole(['admin', 'administrador']);
 
 // Middleware específico para líderes culturales (permite también coordinadores y admins)
 export const requireLeader = requireRole(['Lcultural', 'coordinator', 'admin', 'administrador']);
+=======
+export const requireCoordinator = requireRole(['coordinator', 'admin']);
+
+// Middleware específico para administradores
+export const requireAdmin = requireRole(['admin']);
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 
 // Helper para redirigir al Front después del SSO con el token como query param
 export function redirectWithToken(res, token) {

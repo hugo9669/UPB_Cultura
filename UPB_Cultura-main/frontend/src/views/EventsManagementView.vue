@@ -282,12 +282,15 @@ const { showNotification } = useNotifications()
 // Cargar grupos disponibles
 const availableGroups = ref([])
 
+<<<<<<< HEAD
 // Fecha mínima para eventos (hoy)
 const minDate = computed(() => {
   const today = new Date()
   return today.toISOString().split('T')[0]
 })
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 onMounted(async () => {
   await groupsStore.initializeGroups()
   availableGroups.value = groupsStore.groups

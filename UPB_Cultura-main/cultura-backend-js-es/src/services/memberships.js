@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Membership, User, Group, Category } from "../models/index.js";
+=======
+import { Membership, User, Group } from "../models/index.js";
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 
 export async function upsertMembership({ userId, groupId, role }) {
   // Convertir a números si vienen como strings
@@ -57,47 +61,84 @@ export async function removeMember({ userId, groupId }) {
 
 // Nuevas funciones para gestión de membresías
 export async function joinGroup(userId, groupId) {
+<<<<<<< HEAD
   // Convertir a números si vienen como strings
   const idUsuario = typeof userId === 'string' ? parseInt(userId) : userId;
   const idGrupo = typeof groupId === 'string' ? parseInt(groupId) : groupId;
   
   // Verificar que el grupo existe
   const group = await Group.findByPk(idGrupo);
+=======
+  // Verificar que el grupo existe
+  const group = await Group.findByPk(groupId);
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   if (!group) throw new Error("Grupo no encontrado");
   
   // Crear membresía como miembro por defecto
   const [membership, created] = await Membership.findOrCreate({
+<<<<<<< HEAD
     where: { idUsuario, idGrupo },
     defaults: { 
       idUsuario,
       idGrupo,
       fechaUnion: new Date().toISOString().split('T')[0]
     }
+=======
+    where: { userId, groupId },
+    defaults: { role: "member" }
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   });
   
   if (!created) {
     throw new Error("Ya eres miembro de este grupo");
   }
   
+<<<<<<< HEAD
+=======
+  // Actualizar contador de miembros en el grupo
+  await group.increment('members');
+  
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   return membership;
 }
 
 export async function leaveGroup(userId, groupId) {
+<<<<<<< HEAD
   // Convertir a números si vienen como strings
   const idUsuario = typeof userId === 'string' ? parseInt(userId) : userId;
   const idGrupo = typeof groupId === 'string' ? parseInt(groupId) : groupId;
   
   const membership = await Membership.findOne({ where: { idUsuario, idGrupo } });
+=======
+  const membership = await Membership.findOne({ where: { userId, groupId } });
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   if (!membership) {
     throw new Error("No eres miembro de este grupo");
   }
   
+<<<<<<< HEAD
   await membership.destroy();
   
+=======
+  // No permitir que el coordinador se retire
+  if (membership.role === 'coordinator') {
+    throw new Error("El coordinador no puede abandonar el grupo");
+  }
+  
+  await membership.destroy();
+  
+  // Actualizar contador de miembros en el grupo
+  const group = await Group.findByPk(groupId);
+  if (group) {
+    await group.decrement('members');
+  }
+  
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   return true;
 }
 
 export async function getUserMemberships(userId) {
+<<<<<<< HEAD
   const idUsuario = typeof userId === 'string' ? parseInt(userId) : userId;
   
   const memberships = await Membership.findAll({
@@ -142,15 +183,34 @@ export async function isMember(userId, groupId) {
   const idGrupo = typeof groupId === 'string' ? parseInt(groupId) : groupId;
   
   const membership = await Membership.findOne({ where: { idUsuario, idGrupo } });
+=======
+  return Membership.findAll({
+    where: { userId },
+    include: [{ 
+      model: Group, 
+      attributes: ["id", "name", "category", "description", "image", "categoryColor"] 
+    }]
+  });
+}
+
+export async function isMember(userId, groupId) {
+  const membership = await Membership.findOne({ where: { userId, groupId } });
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   return !!membership;
 }
 
 export async function isCoordinator(userId, groupId) {
+<<<<<<< HEAD
   const idUsuario = typeof userId === 'string' ? parseInt(userId) : userId;
   const idGrupo = typeof groupId === 'string' ? parseInt(groupId) : groupId;
   
   // Ya no tenemos campo 'role' en el modelo, solo verificamos si es miembro
   // En el futuro podrías agregar un campo 'role' a la tabla si lo necesitas
   const membership = await Membership.findOne({ where: { idUsuario, idGrupo } });
+=======
+  const membership = await Membership.findOne({ 
+    where: { userId, groupId, role: 'coordinator' } 
+  });
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   return !!membership;
 }

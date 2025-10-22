@@ -1,6 +1,9 @@
 <template>
   <div class="min-h-screen bg-gray-50">
+<<<<<<< HEAD
     <NotificationContainer />
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     <!-- Header -->
     <div class="bg-white shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -14,6 +17,7 @@
               <p class="text-sm text-gray-600">Bienvenido</p>
               <p class="font-semibold text-gray-900">{{ user?.name }}</p>
             </div>
+<<<<<<< HEAD
             <router-link
               to="/"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2"
@@ -23,6 +27,8 @@
               </svg>
               Inicio
             </router-link>
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             <button
               @click="handleLogout"
               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
@@ -48,6 +54,7 @@
           </router-link>
         </div>
         
+<<<<<<< HEAD
         <!-- Indicador de carga -->
         <div v-if="loadingGroups" class="text-center py-12">
           <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -56,6 +63,9 @@
 
         <!-- Sin grupos -->
         <div v-else-if="myGroups.length === 0" class="text-center py-12">
+=======
+        <div v-if="myGroups.length === 0" class="text-center py-12">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
@@ -73,10 +83,14 @@
             <p class="text-sm text-gray-600 mt-1">{{ group.category }}</p>
             <div class="mt-4 flex items-center justify-between">
               <span class="text-sm text-gray-500">{{ group.members }} miembros</span>
+<<<<<<< HEAD
               <button 
                 @click="viewGroupDetails(group)"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
+=======
+              <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
                 Ver detalles
               </button>
             </div>
@@ -84,6 +98,7 @@
         </div>
       </div>
 
+<<<<<<< HEAD
       <!-- Mis Solicitudes -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <div class="flex items-center justify-between mb-6">
@@ -125,10 +140,36 @@
           <div
             v-for="request in filteredRequests"
             :key="request.id"
+=======
+      <!-- Próximos Eventos -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Próximos Eventos</h2>
+          <router-link
+            to="/eventos"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
+          >
+            Ver Todos
+          </router-link>
+        </div>
+
+        <div v-if="upcomingEvents.length === 0" class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p class="mt-4 text-gray-600">No hay eventos próximos</p>
+        </div>
+
+        <div v-else class="space-y-4">
+          <div
+            v-for="event in upcomingEvents"
+            :key="event.id"
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-300"
           >
             <div class="flex items-start justify-between">
               <div class="flex-1">
+<<<<<<< HEAD
                 <div class="flex items-center gap-3 mb-2">
                   <h3 class="font-semibold text-lg text-gray-900">{{ request.grupo.nombreGrupo }}</h3>
                   <span
@@ -371,11 +412,22 @@
                     <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ event.description }}</p>
               </div>
                   <button class="text-blue-600 hover:text-blue-700 text-sm font-medium ml-4">
+=======
+                <h3 class="font-semibold text-lg text-gray-900">{{ event.title }}</h3>
+                <p class="text-sm text-gray-600 mt-1">{{ event.group }}</p>
+                <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                  <span>{{ formatDate(event.date) }}</span>
+                  <span>{{ event.location }}</span>
+                </div>
+              </div>
+              <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
                 Ver detalles
               </button>
             </div>
           </div>
         </div>
+<<<<<<< HEAD
           </div>
 
           <!-- Footer -->
@@ -812,11 +864,39 @@ const formatDate = (date: string) => {
     }
     
     return dateObj.toLocaleDateString('es-ES', {
+=======
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const user = computed(() => authStore.user)
+
+const myGroups = ref([
+  // Aquí se cargarían los grupos del usuario desde la API
+])
+
+const upcomingEvents = ref([
+  // Aquí se cargarían los próximos eventos desde la API
+])
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString('es-ES', {
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
+<<<<<<< HEAD
   } else {
     // Es solo una fecha (YYYY-MM-DD), parsear manualmente
     const [year, month, day] = date.split('-').map(Number)
@@ -832,12 +912,15 @@ const formatDate = (date: string) => {
       timeZone: 'UTC'
     })
   }
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 }
 
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
 }
+<<<<<<< HEAD
 
 // Funciones para solicitudes de membresía
 const loadMyRequests = async () => {
@@ -1055,11 +1138,16 @@ onMounted(async () => {
   // Cargar mensajes recibidos
   await loadMyMessages()
 })
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 </script>
 
 
 
+<<<<<<< HEAD
 
 
 
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628

@@ -13,6 +13,7 @@
               <p class="text-sm text-gray-600">Bienvenido</p>
               <p class="font-semibold text-gray-900">{{ user?.name }}</p>
             </div>
+<<<<<<< HEAD
             <router-link
               to="/"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2"
@@ -22,6 +23,8 @@
               </svg>
               Inicio
             </router-link>
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             <button
               @click="handleLogout"
               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
@@ -33,6 +36,7 @@
       </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Navegación de Páginas Públicas -->
     <div class="bg-white border-b">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,6 +69,8 @@
       </div>
     </div>
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     <!-- Estadísticas -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -130,6 +136,7 @@
           </div>
         </router-link>
 
+<<<<<<< HEAD
         <button
           @click="openCreateGroupModal"
           class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 text-left"
@@ -147,6 +154,8 @@
           </div>
         </button>
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
         <router-link
           to="/eventos-gestion"
           class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300"
@@ -164,6 +173,7 @@
           </div>
         </router-link>
 
+<<<<<<< HEAD
         <button
           @click="openManageUsersModal"
           class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 text-left"
@@ -223,10 +233,18 @@
             <div class="bg-purple-100 p-3 rounded-lg">
               <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+=======
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center gap-4">
+            <div class="bg-purple-100 p-3 rounded-lg">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
               </svg>
             </div>
             <div>
               <h3 class="font-semibold text-gray-900">Reportes</h3>
+<<<<<<< HEAD
               <p class="text-sm text-gray-600">Ver reportes y estadísticas del sistema</p>
             </div>
           </div>
@@ -710,11 +728,15 @@
 
             <div v-if="allGroups.length === 0" class="text-center py-8">
               <p class="text-gray-500">No hay grupos culturales disponibles</p>
+=======
+              <p class="text-sm text-gray-600">Ver reportes y estadísticas</p>
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
             </div>
           </div>
         </div>
       </div>
     </div>
+<<<<<<< HEAD
 
     <!-- Modal: Contactar Líder del Grupo -->
     <ContactGroupModal
@@ -747,16 +769,24 @@
         <span>{{ notification.message }}</span>
       </div>
     </div>
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   </div>
 </template>
 
 <script setup lang="ts">
+<<<<<<< HEAD
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { apiService } from '@/services/api'
 import EventCalendar from '@/components/EventCalendar.vue'
 import ContactGroupModal from '@/components/ContactGroupModal.vue'
+=======
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -769,6 +799,7 @@ const stats = ref({
   scheduledEvents: 0
 })
 
+<<<<<<< HEAD
 const allEvents = ref<any[]>([])
 const loadingEvents = ref(false)
 
@@ -859,10 +890,13 @@ const notification = ref({
   type: 'info' as 'success' | 'error' | 'info'
 })
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
 }
+<<<<<<< HEAD
 
 const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
   notification.value = { show: true, message, type }
@@ -1230,11 +1264,16 @@ const handleMessageSent = () => {
   showNotification('Mensaje enviado exitosamente al líder cultural', 'success')
   closeContactLeaderModal()
 }
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 </script>
 
 
 
+<<<<<<< HEAD
 
 
 
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628

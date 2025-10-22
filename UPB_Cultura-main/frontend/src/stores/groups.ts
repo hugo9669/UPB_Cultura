@@ -99,6 +99,7 @@ export const useGroupsStore = defineStore('groups', () => {
       const response = await apiService.getGroups()
       if (response.data) {
         groups.value = response.data
+<<<<<<< HEAD
         // Guardar en localStorage solo los datos reales de la API
         saveGroups()
       }
@@ -107,6 +108,19 @@ export const useGroupsStore = defineStore('groups', () => {
       error.value = handleApiError(err)
       // Mostrar array vacío en caso de error
       groups.value = []
+=======
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      // Fallback a datos locales si hay error de conexión
+      const storedGroups = localStorage.getItem('groups')
+      if (storedGroups) {
+        groups.value = JSON.parse(storedGroups)
+      } else {
+        groups.value = sampleGroups
+        saveGroups()
+      }
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     } finally {
       isLoading.value = false
     }

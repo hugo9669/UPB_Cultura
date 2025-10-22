@@ -27,12 +27,20 @@ export async function login({ email, password }) {
     
     if (!user) {
       console.log(`❌ Usuario no encontrado para email: ${email}`);
+<<<<<<< HEAD
       throw new Error("Usuario o contraseña incorrecto");
+=======
+      throw new Error("Usuario no encontrado");
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     }
     
     if (!user.contrasena) {
       console.log(`❌ Usuario sin contraseña para email: ${email}`);
+<<<<<<< HEAD
       throw new Error("Usuario o contraseña incorrecto");
+=======
+      throw new Error("Usuario sin contraseña configurada");
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     }
     
     // Comparar contraseña
@@ -41,7 +49,11 @@ export async function login({ email, password }) {
     
     if (!ok) {
       console.log(`❌ Contraseña incorrecta para email: ${email}`);
+<<<<<<< HEAD
       throw new Error("Usuario o contraseña incorrecto");
+=======
+      throw new Error("Contraseña incorrecta");
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     }
     
     // Obtener el nombre del rol

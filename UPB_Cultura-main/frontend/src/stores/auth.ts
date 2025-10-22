@@ -41,6 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+<<<<<<< HEAD
   // Función auxiliar para limpiar todos los datos de autenticación
   const cleanupAuth = () => {
     user.value = null
@@ -52,6 +53,8 @@ export const useAuthStore = defineStore('auth', () => {
     // No removemos authVersion para mantener el control de versión
   }
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   const logout = async () => {
     try {
       await apiService.logout()
@@ -59,7 +62,16 @@ export const useAuthStore = defineStore('auth', () => {
       // Ignorar errores de logout en el servidor
       console.warn('Error al hacer logout en el servidor:', error)
     } finally {
+<<<<<<< HEAD
       cleanupAuth()
+=======
+      user.value = null
+      isLoggedIn.value = false
+      jwt.value = null
+      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('userData')
+      localStorage.removeItem('token')
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     }
   }
 
@@ -77,6 +89,7 @@ export const useAuthStore = defineStore('auth', () => {
     const storedUser = localStorage.getItem('userData')
     const storedToken = localStorage.getItem('token')
     
+<<<<<<< HEAD
     // Asegurar que empezamos limpio si no hay token
     if (!storedToken) {
       console.log('ℹ️ No hay token, asegurando estado limpio')
@@ -155,6 +168,36 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       console.log('⚠️ Error al parsear datos de usuario, limpiando...')
       cleanupAuth()
+=======
+    // Solo inicializar si hay TODOS los datos necesarios
+    if (storedAuth === 'true' && storedUser && storedToken) {
+      // Validación básica de forma de JWT (tres segmentos)
+      const looksLikeJwt = storedToken.split('.').length === 3
+      if (!looksLikeJwt) {
+        console.log('⚠️ Token inválido en localStorage, limpiando...')
+        logout()
+        return
+      }
+      try {
+        const userData = JSON.parse(storedUser)
+        // Verificar que el usuario tiene los campos necesarios
+        const validRole = ['administrador','usuario','Lcultural'].includes(userData?.role)
+        if (userData && userData.id && userData.email && validRole) {
+          isLoggedIn.value = true
+          user.value = userData
+          jwt.value = storedToken
+          console.log('✅ Usuario autenticado desde localStorage:', userData.name)
+        } else {
+          console.log('⚠️ Datos de usuario inválidos, limpiando...')
+          logout()
+        }
+      } catch (error) {
+        console.log('⚠️ Error al parsear datos de usuario, limpiando...')
+        logout()
+      }
+    } else {
+      console.log('ℹ️ No hay datos de autenticación válidos')
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     }
   }
 

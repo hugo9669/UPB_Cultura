@@ -60,6 +60,7 @@ export async function createEvent(payload) {
   }
   
   const e = await Event.create(payload);
+<<<<<<< HEAD
   
   console.log('✅ Evento creado:', {
     id: e.id,
@@ -78,6 +79,16 @@ export async function createEvent(payload) {
   
   // Convertir a objeto plano para evitar problemas con Sequelize
   return e.toJSON();
+=======
+  if (isRedisAvailable()) {
+    try {
+      await getRedis().flushall();
+    } catch (error) {
+      console.log('[Redis] Error al limpiar cache:', error.message);
+    }
+  }
+  return e;
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 }
 
 export async function listEvents({ q, groupId, category, dateFrom, dateTo, upcoming, limit = 20, offset = 0 }) {
@@ -87,24 +98,35 @@ export async function listEvents({ q, groupId, category, dateFrom, dateTo, upcom
       const key = `events:list:${q||""}:${groupId||""}:${category||""}:${dateFrom||""}:${dateTo||""}:${upcoming||""}:${limit}:${offset}`;
       const redis = getRedis();
       const cached = await redis.get(key);
+<<<<<<< HEAD
       if (cached) {
         console.log('✅ Eventos obtenidos del cache');
         return JSON.parse(cached);
       }
     } catch (error) {
       console.log('⚠️ Redis no disponible, continuando sin caché');
+=======
+      if (cached) return JSON.parse(cached);
+    } catch (error) {
+      console.log('[Redis] Error al obtener cache:', error.message);
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     }
   }
 
   const where = {};
   if (q) where.titulo = { [Op.iLike]: `%${q}%` };
+<<<<<<< HEAD
   if (groupId) where.idGrupo = parseInt(groupId);
+=======
+  if (groupId) where.idGrupo = groupId;
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   if (category) where.category = category;
   if (dateFrom || dateTo) where.fechaEvento = { ...(where.fechaEvento || {}) };
   if (dateFrom) where.fechaEvento[Op.gte] = new Date(dateFrom);
   if (dateTo) where.fechaEvento[Op.lte] = new Date(dateTo);
   if (upcoming) where.fechaEvento = { ...(where.fechaEvento||{}), [Op.gte]: new Date() };
 
+<<<<<<< HEAD
   console.log('📊 Buscando eventos con filtros:', where);
 
   const items = await Event.findAll({ 
@@ -143,11 +165,15 @@ export async function listEvents({ q, groupId, category, dateFrom, dateTo, upcom
       return itemJSON;
     })
   );
+=======
+  const items = await Event.findAll({ where, limit, offset, order: [["fechaEvento", "ASC"]] });
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   
   // Intentar guardar en cache si Redis está disponible
   if (isRedisAvailable()) {
     try {
       const key = `events:list:${q||""}:${groupId||""}:${category||""}:${dateFrom||""}:${dateTo||""}:${upcoming||""}:${limit}:${offset}`;
+<<<<<<< HEAD
       await getRedis().setex(key, 60, JSON.stringify(itemsWithCategory));
     } catch (error) {
       console.log('⚠️ No se pudo guardar en caché');
@@ -155,6 +181,15 @@ export async function listEvents({ q, groupId, category, dateFrom, dateTo, upcom
   }
   
   return itemsWithCategory;
+=======
+      await getRedis().setex(key, 60, JSON.stringify(items));
+    } catch (error) {
+      console.log('[Redis] Error al guardar cache:', error.message);
+    }
+  }
+  
+  return items;
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 }
 
 export async function getEvent(id) {

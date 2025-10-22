@@ -25,6 +25,7 @@ const authStore = useAuthStore()
 const eventsStore = useEventsStore()
 const groupsStore = useGroupsStore()
 
+<<<<<<< HEAD
 // Ocultar header en login y en los paneles (cada panel tiene su propio header)
 const hideHeader = computed(() => {
   const path = route.path
@@ -35,6 +36,8 @@ const hideHeader = computed(() => {
          path === '/dashboard'
 })
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 onMounted(async () => {
   // Inicializar stores
   authStore.initializeAuth()

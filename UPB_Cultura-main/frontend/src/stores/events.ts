@@ -21,8 +21,11 @@ export const useEventsStore = defineStore('events', () => {
   const selectedCategory = ref('')
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+<<<<<<< HEAD
   const availableCategories = ref<Array<{ id: number; name: string; description: string }>>([])
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
 
   // Eventos de ejemplo
   const sampleEvents: Event[] = [
@@ -105,6 +108,7 @@ export const useEventsStore = defineStore('events', () => {
     error.value = null
     
     try {
+<<<<<<< HEAD
       // Cargar categorías desde el backend
       const categoriesResponse = await apiService.getCategories()
       if (categoriesResponse.data) {
@@ -112,14 +116,27 @@ export const useEventsStore = defineStore('events', () => {
       }
       
       // Cargar eventos
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
       const response = await apiService.getEvents()
       if (response.data) {
         events.value = response.data
       }
     } catch (err: any) {
       error.value = handleApiError(err)
+<<<<<<< HEAD
       console.error('Error al cargar eventos:', err)
       events.value = []
+=======
+      // Fallback a datos locales si hay error de conexión
+      const storedEvents = localStorage.getItem('events')
+      if (storedEvents) {
+        events.value = JSON.parse(storedEvents)
+      } else {
+        events.value = sampleEvents
+        saveEvents()
+      }
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     } finally {
       isLoading.value = false
     }

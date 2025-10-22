@@ -105,7 +105,32 @@
             </span>
             {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
           </button>
+<<<<<<< HEAD
           <p v-if="formError" class="mt-3 text-sm text-red-600 text-center">{{ formError }}</p>
+=======
+        </div>
+
+        <!-- Credenciales de prueba -->
+        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <h4 class="text-sm font-medium text-yellow-800 mb-2">Credenciales de Prueba:</h4>
+          <div class="space-y-2 text-xs text-yellow-700">
+            <div>
+              <strong>👤 Usuario:</strong><br>
+              Email: hugo.hernandezm@upb.edu.co<br>
+              Contraseña: hahm2006
+            </div>
+            <div class="border-t border-yellow-300 pt-2">
+              <strong>🎭 Líder Cultural:</strong><br>
+              Email: juan.canon@upb.edu.co<br>
+              Contraseña: 12345678
+            </div>
+            <div class="border-t border-yellow-300 pt-2">
+              <strong>👑 Administrador:</strong><br>
+              Email: cesar.rodriguez@upb.edu.co<br>
+              Contraseña: hola1234
+            </div>
+          </div>
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
         </div>
       </form>
       </div>
@@ -205,9 +230,13 @@ const handleLogin = async () => {
         router.push('/dashboard')
       }
     } else {
+<<<<<<< HEAD
       const msg = result.error || 'Usuario o contraseña incorrecto'
       formError.value = msg
       showNotification(msg, 'error')
+=======
+      showNotification(result.error || 'Credenciales incorrectas', 'error')
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     }
   } catch (error) {
     formError.value = 'Usuario o contraseña incorrecto'

@@ -60,6 +60,7 @@ class ApiService {
         headers,
       })
 
+<<<<<<< HEAD
       // Manejar respuestas sin contenido (204 No Content)
       if (response.status === 204) {
         if (!response.ok) {
@@ -71,6 +72,8 @@ class ApiService {
         return { data: undefined as T }
       }
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
       const data = await response.json()
 
       if (!response.ok) {
@@ -112,6 +115,7 @@ class ApiService {
     })
   }
 
+<<<<<<< HEAD
   async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PATCH',
@@ -119,6 +123,8 @@ class ApiService {
     })
   }
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'DELETE' })
   }
@@ -156,11 +162,14 @@ class ApiService {
     return response
   }
 
+<<<<<<< HEAD
   // Métodos para categorías
   async getCategories(): Promise<ApiResponse<Array<{ id: number; name: string; description: string }>>> {
     return this.get('/categories')
   }
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   // Métodos para eventos
   async getEvents(): Promise<ApiResponse<FrontendEvent[]>> {
     const response = await this.get<BackendEvent[]>('/events')
@@ -188,6 +197,7 @@ class ApiService {
   }
 
   async updateEvent(id: string, eventData: Partial<FrontendEvent>, groupId?: string): Promise<ApiResponse<FrontendEvent>> {
+<<<<<<< HEAD
     // Para actualizar, necesitamos el groupId
     // Primero intentar obtenerlo de eventData, luego del parámetro, luego del evento existente
     let targetGroupId = eventData.groupId || groupId
@@ -201,6 +211,16 @@ class ApiService {
       targetGroupId = existingEvent.data.groupId || '1' // Fallback a grupo 1 si no existe
     }
 
+=======
+    // Para actualizar, necesitamos el groupId existente
+    const existingEvent = await this.getEvent(id)
+    if (!existingEvent.data) {
+      return { error: 'Evento no encontrado' }
+    }
+
+    // Usar el groupId proporcionado o extraerlo del evento existente
+    const targetGroupId = groupId || 'existing-group-id' // Se debería extraer del evento existente
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     const backendData = adaptEventToBackend(eventData, targetGroupId)
     const response = await this.put<BackendEvent>(`/events/${id}`, backendData)
     if (response.data) {
@@ -241,7 +261,11 @@ class ApiService {
 
   async updateGroup(id: string, groupData: Partial<FrontendGroup>): Promise<ApiResponse<FrontendGroup>> {
     const backendData = adaptGroupToBackend(groupData)
+<<<<<<< HEAD
     const response = await this.patch<BackendGroup>(`/groups/${id}`, backendData)
+=======
+    const response = await this.put<BackendGroup>(`/groups/${id}`, backendData)
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
     if (response.data) {
       return { data: adaptGroupFromBackend(response.data) }
     }
@@ -265,6 +289,7 @@ class ApiService {
     return this.delete<void>(`/memberships/${groupId}/leave`)
   }
 
+<<<<<<< HEAD
   async getGroupMembers(groupId: string): Promise<ApiResponse<any[]>> {
     return this.get<any[]>(`/memberships/groups/${groupId}/members`)
   }
@@ -312,6 +337,8 @@ class ApiService {
     return response
   }
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   // Métodos para anuncios
   async getAnnouncements(): Promise<ApiResponse<any[]>> {
     return this.get<any[]>('/announcements')
@@ -340,6 +367,7 @@ class ApiService {
     return this.get<any>('/admin/dashboard')
   }
 
+<<<<<<< HEAD
   async getStats(): Promise<ApiResponse<{ totalGroups: number; activeUsers: number; scheduledEvents: number }>> {
     return this.get<{ totalGroups: number; activeUsers: number; scheduledEvents: number }>('/admin/dashboard/stats')
   }
@@ -367,6 +395,8 @@ class ApiService {
     return this.get<any[]>('/memberships/my-memberships')
   }
 
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   // Métodos para media/archivos
   async uploadImage(file: File): Promise<ApiResponse<{ url: string }>> {
     const formData = new FormData()
@@ -416,6 +446,7 @@ export const apiService = new ApiService(API_BASE_URL)
 export const handleApiError = (error: ApiError): string => {
   // Errores específicos de autenticación
   if (error.error === 'Usuario no encontrado') {
+<<<<<<< HEAD
     return 'Usuario o contraseña incorrecto'
   }
   
@@ -433,6 +464,21 @@ export const handleApiError = (error: ApiError): string => {
   
   if (error.error === 'Credenciales inválidas') {
     return 'Usuario o contraseña incorrecto'
+=======
+    return 'El correo electrónico no está registrado en el sistema.'
+  }
+  
+  if (error.error === 'Contraseña incorrecta') {
+    return 'La contraseña es incorrecta.'
+  }
+  
+  if (error.error === 'Usuario sin contraseña configurada') {
+    return 'El usuario no tiene contraseña configurada. Contacta al administrador.'
+  }
+  
+  if (error.error === 'Credenciales inválidas') {
+    return 'Correo electrónico o contraseña incorrectos.'
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
   }
 
   // Errores de estado HTTP
@@ -461,6 +507,7 @@ export const handleApiError = (error: ApiError): string => {
 
   return error.message || error.error || 'Error desconocido'
 }
+<<<<<<< HEAD
 
 // Métodos para mensajes
 apiService.sendMessage = async function(messageData: {
@@ -610,3 +657,5 @@ apiService.deleteProcessedMembershipRequest = async function(requestId: number):
 apiService.deleteProcessedRequestByLeader = async function(requestId: number): Promise<ApiResponse<any>> {
   return this.delete<any>(`/membership-requests/${requestId}/leader`)
 }
+=======
+>>>>>>> 2a4d31bf707bb7e535d6fe594859d8b61919a628
