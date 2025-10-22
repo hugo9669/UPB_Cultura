@@ -97,6 +97,12 @@ npm run dev
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:4000
 
+## Credenciales de Prueba
+
+### Usuario Administrador
+- **Email**: `admin@upb.edu.co`
+- **Contraseña**: `admin123`
+
 ### Roles de Usuario
 - **Admin**: Acceso completo al sistema
 - **Coordinator**: Gestión de grupos asignados
@@ -201,6 +207,16 @@ UPB_Cultura/
 - `GET /admin/dashboard/summary` - Resumen del dashboard
 - `GET /reports/events` - Reportes de eventos
 - `GET /reports/groups` - Reportes de grupos
+
+## Base de Datos
+
+### Entidades Principales
+- **Users** - Usuarios del sistema (admin, coordinator, user)
+- **Groups** - Grupos culturales con coordinadores
+- **Events** - Eventos culturales con fechas y ubicaciones
+- **Memberships** - Membresías de usuarios (pending, approved, rejected)
+- **Messages** - Sistema de mensajería entre usuarios
+- **Categories** - Categorías de eventos y grupos
 
 ## Diseño y UX
 
