@@ -63,6 +63,27 @@
       </button>
     </section>
 
+    <!-- Botón de acceso rápido para administradores -->
+    <section v-if="authStore.isAdmin" class="py-6 bg-gradient-to-r from-blue-600 to-blue-800">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <div class="text-white mb-4 md:mb-0">
+            <h3 class="text-2xl font-bold">Panel de Administrador</h3>
+            <p class="text-blue-100">Accede a todas las funciones de gestión del sistema</p>
+          </div>
+          <router-link
+            to="/admin"
+            class="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Ir al Panel de Administrador
+          </router-link>
+        </div>
+      </div>
+    </section>
+
     <!-- Sección de características -->
     <section class="py-16 bg-white">
       <div class="container mx-auto px-4">
@@ -132,9 +153,11 @@ import { computed } from 'vue'
 import { useCarousel } from '../composables/useCarousel'
 import { useEventsStore } from '../stores/events'
 import { useGroupsStore } from '../stores/groups'
+import { useAuthStore } from '../stores/auth'
 
 const eventsStore = useEventsStore()
 const groupsStore = useGroupsStore()
+const authStore = useAuthStore()
 
 const carouselItems = [
   {

@@ -16,7 +16,15 @@ export function passportInit(app) {
     try {
       const user = await User.findByPk(payload.sub);
       if (!user) return done(null, false);
-      return done(null, { id: user.id, username: user.username, role: user.role });
+      
+      // Incluir nombre y correo para usarlos en la mensajería
+      return done(null, { 
+        id: user.id, 
+        username: user.nombre || 'Usuario',
+        nombre: user.nombre,
+        correo: user.correo,
+        role: payload.role || 'usuario' 
+      });
     } catch (err) {
       return done(err, false);
     }
@@ -55,6 +63,30 @@ export function passportInit(app) {
 }
 
 export const requireAuth = passport.authenticate("jwt", { session: false });
+
+// Middleware de autorización por roles
+export const requireRole = (roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'No autenticado' });
+    }
+    
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Acceso denegado. Rol insuficiente.' });
+    }
+    
+    next();
+  };
+};
+
+// Middleware específico para coordinadores
+export const requireCoordinator = requireRole(['coordinator', 'admin', 'administrador']);
+
+// Middleware específico para administradores
+export const requireAdmin = requireRole(['admin', 'administrador']);
+
+// Middleware específico para líderes culturales (permite también coordinadores y admins)
+export const requireLeader = requireRole(['Lcultural', 'coordinator', 'admin', 'administrador']);
 
 // Helper para redirigir al Front después del SSO con el token como query param
 export function redirectWithToken(res, token) {

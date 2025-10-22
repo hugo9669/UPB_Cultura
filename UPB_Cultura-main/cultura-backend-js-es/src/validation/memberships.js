@@ -1,11 +1,17 @@
 import Joi from "joi";
 
 export const upsertMembershipSchema = Joi.object({
-  userId: Joi.string().uuid().required(),
-  groupId: Joi.string().uuid().required(),
-  role: Joi.string().valid("coordinator", "leader", "member").required()
+  userId: Joi.alternatives().try(
+    Joi.number().integer().positive(),
+    Joi.string().pattern(/^\d+$/)
+  ).required(),
+  groupId: Joi.alternatives().try(
+    Joi.number().integer().positive(),
+    Joi.string().pattern(/^\d+$/)
+  ).required(),
+  role: Joi.string().valid("coordinator", "leader", "member", "miembro").default("miembro")
 });
 
 export const updateMembershipSchema = Joi.object({
-  role: Joi.string().valid("coordinator", "leader", "member").required()
+  role: Joi.string().valid("coordinator", "leader", "member", "miembro").required()
 });

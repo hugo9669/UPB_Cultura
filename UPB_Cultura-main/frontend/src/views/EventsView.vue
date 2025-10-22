@@ -1,6 +1,19 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-8 md:py-12">
+      <!-- Botón Volver al Panel (visible solo cuando está logueado) -->
+      <div v-if="authStore.isLoggedIn" class="mb-6">
+        <button
+          @click="goToPanel"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 shadow-md"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Volver al Panel
+        </button>
+      </div>
+
       <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center">
         Próximos Eventos
       </h2>
@@ -55,18 +68,12 @@
               {{ formatDate(event.date) }} | {{ event.location }}
             </p>
             <p class="mt-4 text-gray-600">{{ event.description }}</p>
-            <div class="mt-4 flex justify-between items-center">
+            <div class="mt-4 flex justify-start">
               <button 
                 @click="viewEventDetails(event)"
                 class="text-blue-600 hover:text-blue-800 font-medium transition duration-300"
               >
                 Ver Detalles
-              </button>
-              <button 
-                @click="registerForEvent(event)"
-                class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300"
-              >
-                Registrarse
               </button>
             </div>
           </div>
@@ -88,20 +95,23 @@
       v-if="selectedEvent"
       :event="selectedEvent"
       @close="selectedEvent = null"
-      @register="registerForEvent"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useEventsStore } from '../stores/events'
+import { useAuthStore } from '../stores/auth'
 import { useNotifications } from '../composables/useNotifications'
 import { useModal } from '../composables/useModal'
 import EventDetailsModal from '../components/EventDetailsModal.vue'
 import type { Event } from '../stores/events'
 
+const router = useRouter()
 const eventsStore = useEventsStore()
+const authStore = useAuthStore()
 const { showNotification } = useNotifications()
 const { open: openModal } = useModal()
 
@@ -116,17 +126,37 @@ const viewEventDetails = (event: Event) => {
   selectedEvent.value = event
 }
 
-const registerForEvent = (event: Event) => {
-  showNotification(`Te has registrado para: ${event.name}`, 'success')
-  // Aquí se podría implementar la lógica de registro real
+const formatDate = (dateString: string) => {
+  // dateString viene como "2025-10-29"
+  // Parsear directamente sin usar Date object para evitar problemas de timezone
+  const [year, month, day] = dateString.split('-')
+  
+  const monthNames = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ]
+  
+  const monthIndex = parseInt(month) - 1
+  const monthName = monthNames[monthIndex]
+  
+  return `${parseInt(day)} de ${monthName} de ${year}`
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+const goToPanel = () => {
+  const role = authStore.user?.role
+  
+  switch (role) {
+    case 'administrador':
+      router.push('/admin')
+      break
+    case 'Lcultural':
+      router.push('/lider')
+      break
+    case 'usuario':
+      router.push('/usuario')
+      break
+    default:
+      router.push('/')
+  }
 }
 </script>

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { apiService, handleApiError } from '@/services/api'
 
 export interface Event {
   id: string
@@ -18,6 +19,10 @@ export const useEventsStore = defineStore('events', () => {
   const events = ref<Event[]>([])
   const searchTerm = ref('')
   const selectedCategory = ref('')
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
+  const availableCategories = ref<Array<{ id: number; name: string; description: string }>>([])
+
 
   // Eventos de ejemplo
   const sampleEvents: Event[] = [
@@ -95,13 +100,28 @@ export const useEventsStore = defineStore('events', () => {
     }
   ]
 
-  const initializeEvents = () => {
-    const storedEvents = localStorage.getItem('events')
-    if (storedEvents) {
-      events.value = JSON.parse(storedEvents)
-    } else {
-      events.value = sampleEvents
-      saveEvents()
+  const initializeEvents = async () => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      // Cargar categorías desde el backend
+      const categoriesResponse = await apiService.getCategories()
+      if (categoriesResponse.data) {
+        availableCategories.value = categoriesResponse.data
+      }
+      
+      // Cargar eventos
+      const response = await apiService.getEvents()
+      if (response.data) {
+        events.value = response.data
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      console.error('Error al cargar eventos:', err)
+      events.value = []
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -109,31 +129,85 @@ export const useEventsStore = defineStore('events', () => {
     localStorage.setItem('events', JSON.stringify(events.value))
   }
 
-  const addEvent = (event: Omit<Event, 'id' | 'createdAt'>) => {
-    const newEvent: Event = {
-      ...event,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+  const addEvent = async (event: Omit<Event, 'id' | 'createdAt'>, groupId: string): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.createEvent(event, groupId)
+      if (response.data) {
+        events.value.push(response.data)
+        saveEvents()
+        return { success: true }
+      } else {
+        return { success: false, error: 'Error al crear el evento' }
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
     }
-    events.value.push(newEvent)
-    saveEvents()
   }
 
-  const updateEvent = (id: string, updatedEvent: Partial<Event>) => {
-    const index = events.value.findIndex(event => event.id === id)
-    if (index !== -1) {
-      events.value[index] = { ...events.value[index], ...updatedEvent }
+  const updateEvent = async (id: string, updatedEvent: Partial<Event>): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.updateEvent(id, updatedEvent)
+      if (response.data) {
+        const index = events.value.findIndex(event => event.id === id)
+        if (index !== -1) {
+          events.value[index] = response.data
+          saveEvents()
+        }
+        return { success: true }
+      } else {
+        return { success: false, error: 'Error al actualizar el evento' }
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const deleteEvent = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      await apiService.deleteEvent(id)
+      events.value = events.value.filter(event => event.id !== id)
       saveEvents()
+      return { success: true }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
     }
-  }
-
-  const deleteEvent = (id: string) => {
-    events.value = events.value.filter(event => event.id !== id)
-    saveEvents()
   }
 
   const filteredEvents = computed(() => {
     let filtered = events.value
+    
+    // Filtrar eventos que ya pasaron (solo mostrar eventos futuros)
+    const now = new Date()
+    filtered = filtered.filter(event => {
+      // Construir la fecha del evento con su hora
+      const eventDateStr = event.date // formato "YYYY-MM-DD"
+      const eventTimeStr = event.time || "00:00" // formato "HH:MM"
+      const [year, month, day] = eventDateStr.split('-').map(Number)
+      const [hours, minutes] = eventTimeStr.split(':').map(Number)
+      
+      // Crear fecha del evento en hora local
+      const eventDate = new Date(year, month - 1, day, hours, minutes)
+      
+      return eventDate >= now
+    })
 
     if (searchTerm.value) {
       const term = searchTerm.value.toLowerCase()
@@ -169,14 +243,16 @@ export const useEventsStore = defineStore('events', () => {
   })
 
   const categories = computed(() => {
-    const uniqueCategories = [...new Set(events.value.map(event => event.category))]
-    return uniqueCategories
+    // Retornar categorías cargadas de la BD
+    return availableCategories.value.map(cat => cat.name)
   })
 
   return {
     events,
     searchTerm,
     selectedCategory,
+    isLoading,
+    error,
     filteredEvents,
     upcomingEvents,
     pastEvents,

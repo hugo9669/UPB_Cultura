@@ -7,8 +7,10 @@ export interface Notification {
   duration?: number
 }
 
+// Estado compartido a nivel de módulo para asegurar instancia única en toda la app
+const notifications = ref<Notification[]>([])
+
 export function useNotifications() {
-  const notifications = ref<Notification[]>([])
 
   const showNotification = (message: string, type: Notification['type'] = 'info', duration = 3000) => {
     const id = Date.now().toString()

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { apiService, handleApiError } from '@/services/api'
 
 export interface Group {
   id: string
@@ -9,7 +10,6 @@ export interface Group {
   categoryColor: string
   image: string
   members: number
-  founded: string
   director: string
   photos: string[]
 }
@@ -18,6 +18,8 @@ export const useGroupsStore = defineStore('groups', () => {
   const groups = ref<Group[]>([])
   const searchTerm = ref('')
   const selectedCategory = ref('')
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
 
   // Grupos de ejemplo
   const sampleGroups: Group[] = [
@@ -29,7 +31,6 @@ export const useGroupsStore = defineStore('groups', () => {
       categoryColor: 'blue',
       image: 'https://placehold.co/400x300/1e40af/ffffff?text=Coro+UPB',
       members: 25,
-      founded: '2015',
       director: 'María González',
       photos: []
     },
@@ -41,7 +42,6 @@ export const useGroupsStore = defineStore('groups', () => {
       categoryColor: 'red',
       image: 'https://placehold.co/400x300/b91c1c/ffffff?text=Teatro+UPB',
       members: 18,
-      founded: '2012',
       director: 'Carlos Mendoza',
       photos: []
     },
@@ -53,7 +53,6 @@ export const useGroupsStore = defineStore('groups', () => {
       categoryColor: 'green',
       image: 'https://placehold.co/400x300/059669/ffffff?text=Danza+Folclórica',
       members: 30,
-      founded: '2010',
       director: 'Ana Rodríguez',
       photos: []
     },
@@ -65,7 +64,6 @@ export const useGroupsStore = defineStore('groups', () => {
       categoryColor: 'purple',
       image: 'https://placehold.co/400x300/7c3aed/ffffff?text=Orquesta+UPB',
       members: 45,
-      founded: '2008',
       director: 'Roberto Silva',
       photos: []
     },
@@ -77,7 +75,6 @@ export const useGroupsStore = defineStore('groups', () => {
       categoryColor: 'indigo',
       image: 'https://placehold.co/400x300/4f46e5/ffffff?text=Cine+Club',
       members: 22,
-      founded: '2018',
       director: 'Laura Torres',
       photos: []
     },
@@ -89,19 +86,29 @@ export const useGroupsStore = defineStore('groups', () => {
       categoryColor: 'yellow',
       image: 'https://placehold.co/400x300/eab308/ffffff?text=Literatura+UPB',
       members: 15,
-      founded: '2016',
       director: 'Pedro Vargas',
       photos: []
     }
   ]
 
-  const initializeGroups = () => {
-    const storedGroups = localStorage.getItem('groups')
-    if (storedGroups) {
-      groups.value = JSON.parse(storedGroups)
-    } else {
-      groups.value = sampleGroups
-      saveGroups()
+  const initializeGroups = async () => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.getGroups()
+      if (response.data) {
+        groups.value = response.data
+        // Guardar en localStorage solo los datos reales de la API
+        saveGroups()
+      }
+    } catch (err: any) {
+      console.error('Error al cargar grupos desde la API:', err)
+      error.value = handleApiError(err)
+      // Mostrar array vacío en caso de error
+      groups.value = []
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -109,26 +116,66 @@ export const useGroupsStore = defineStore('groups', () => {
     localStorage.setItem('groups', JSON.stringify(groups.value))
   }
 
-  const addGroup = (group: Omit<Group, 'id'>) => {
-    const newGroup: Group = {
-      ...group,
-      id: Date.now().toString()
+  const addGroup = async (group: Omit<Group, 'id'>): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.createGroup(group)
+      if (response.data) {
+        groups.value.push(response.data)
+        saveGroups()
+        return { success: true }
+      } else {
+        return { success: false, error: 'Error al crear el grupo' }
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
     }
-    groups.value.push(newGroup)
-    saveGroups()
   }
 
-  const updateGroup = (id: string, updatedGroup: Partial<Group>) => {
-    const index = groups.value.findIndex(group => group.id === id)
-    if (index !== -1) {
-      groups.value[index] = { ...groups.value[index], ...updatedGroup }
+  const updateGroup = async (id: string, updatedGroup: Partial<Group>): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      const response = await apiService.updateGroup(id, updatedGroup)
+      if (response.data) {
+        const index = groups.value.findIndex(group => group.id === id)
+        if (index !== -1) {
+          groups.value[index] = response.data
+          saveGroups()
+        }
+        return { success: true }
+      } else {
+        return { success: false, error: 'Error al actualizar el grupo' }
+      }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const deleteGroup = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      await apiService.deleteGroup(id)
+      groups.value = groups.value.filter(group => group.id !== id)
       saveGroups()
+      return { success: true }
+    } catch (err: any) {
+      error.value = handleApiError(err)
+      return { success: false, error: handleApiError(err) }
+    } finally {
+      isLoading.value = false
     }
-  }
-
-  const deleteGroup = (id: string) => {
-    groups.value = groups.value.filter(group => group.id !== id)
-    saveGroups()
   }
 
   const addPhotoToGroup = (groupId: string, photoUrl: string) => {
@@ -176,6 +223,8 @@ export const useGroupsStore = defineStore('groups', () => {
     groups,
     searchTerm,
     selectedCategory,
+    isLoading,
+    error,
     filteredGroups,
     categories,
     initializeGroups,

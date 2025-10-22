@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { summaryCtrl } from "../controllers/dashboard.js";
-import { requireAuth } from "../config/passport.js";
+import { requireAuth, requireAdmin } from "../config/passport.js";
+import { getStatsCtrl } from "../controllers/dashboard.js";
 
 const r = Router();
 
-// KPIs básicos (idealmente restringir a admin)
-r.get("/summary", requireAuth, summaryCtrl);
+// Ruta para obtener estadísticas del dashboard (solo administradores)
+r.get("/stats", requireAuth, requireAdmin, getStatsCtrl);
 
 export default r;

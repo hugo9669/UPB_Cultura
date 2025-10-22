@@ -2,6 +2,19 @@
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-8 md:py-12">
       <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+        <!-- Botón para volver al panel de administrador -->
+        <div class="mb-6">
+          <router-link 
+            to="/admin" 
+            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-300 shadow-sm hover:shadow-md"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver al Panel
+          </router-link>
+        </div>
+        
         <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 text-center mb-6">
           Gestión de Eventos
         </h2>
@@ -52,9 +65,12 @@
                   id="event-date"
                   v-model="eventForm.date"
                   type="date"
+                  :min="minDate"
+                  required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
                   :class="{ 'border-red-500': errors.date }"
                 />
+                <p class="text-xs text-gray-500 mt-1">La fecha debe ser igual o posterior a hoy</p>
                 <p v-if="errors.date" class="mt-1 text-sm text-red-600">{{ errors.date }}</p>
               </div>
               
@@ -98,13 +114,29 @@
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
               >
                 <option value="">Selecciona una categoría</option>
-                <option value="Música">Música</option>
-                <option value="Teatro">Teatro</option>
-                <option value="Danza">Danza</option>
-                <option value="Artes Visuales">Artes Visuales</option>
-                <option value="Literatura">Literatura</option>
-                <option value="Cine">Cine</option>
+                <option v-for="category in eventsStore.categories" :key="category" :value="category">
+                  {{ category === 'Musica' ? 'Música' : category }}
+                </option>
               </select>
+            </div>
+            
+            <!-- ✅ Campo de selección de grupo -->
+            <div>
+              <label for="event-group" class="block text-sm font-medium text-gray-700 mb-1">
+                Grupo Cultural
+              </label>
+              <select
+                id="event-group"
+                v-model="eventForm.groupId"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+                :class="{ 'border-red-500': errors.groupId }"
+              >
+                <option value="">Selecciona un grupo</option>
+                <option v-for="group in availableGroups" :key="group.id" :value="group.id">
+                  {{ group.name }} ({{ group.category }})
+                </option>
+              </select>
+              <p v-if="errors.groupId" class="mt-1 text-sm text-red-600">{{ errors.groupId }}</p>
             </div>
             
             <button
@@ -237,13 +269,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useEventsStore } from '../stores/events'
+import { useGroupsStore } from '../stores/groups'
 import { useNotifications } from '../composables/useNotifications'
 import type { Event } from '../stores/events'
 
 const eventsStore = useEventsStore()
+const groupsStore = useGroupsStore()
 const { showNotification } = useNotifications()
+
+// Cargar grupos disponibles
+const availableGroups = ref([])
+
+// Fecha mínima para eventos (hoy)
+const minDate = computed(() => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+})
+
+onMounted(async () => {
+  await groupsStore.initializeGroups()
+  availableGroups.value = groupsStore.groups
+})
 
 const eventForm = reactive({
   name: '',
@@ -251,7 +299,8 @@ const eventForm = reactive({
   date: '',
   time: '',
   location: '',
-  category: ''
+  category: '',
+  groupId: '' // ✅ Agregar selección de grupo
 })
 
 const errors = reactive({
@@ -259,7 +308,8 @@ const errors = reactive({
   description: '',
   date: '',
   time: '',
-  location: ''
+  location: '',
+  groupId: '' // ✅ Agregar validación para grupo
 })
 
 const isSaving = ref(false)
@@ -299,6 +349,12 @@ const validateForm = () => {
     isValid = false
   }
 
+  // ✅ Validar que se seleccione un grupo
+  if (!eventForm.groupId) {
+    errors.groupId = 'Debe seleccionar un grupo cultural'
+    isValid = false
+  }
+
   return isValid
 }
 
@@ -319,22 +375,36 @@ const saveEvent = async () => {
       location: eventForm.location.trim(),
       category: eventForm.category || 'General',
       categoryColor: getCategoryColor(eventForm.category),
-      image: 'https://placehold.co/600x400/1a202c/ffffff?text=Evento'
+      image: 'https://placehold.co/600x400/1a202c/ffffff?text=Evento',
+      groupId: eventForm.groupId // ✅ Incluir groupId en eventData
     }
 
+    let result: { success: boolean; error?: string }
+    
     if (editingEvent.value) {
-      eventsStore.updateEvent(editingEvent.value.id, eventData)
-      showNotification('Evento actualizado exitosamente', 'success')
-      editingEvent.value = null
+      result = await eventsStore.updateEvent(editingEvent.value.id, eventData)
+      if (result.success) {
+        showNotification('Evento actualizado exitosamente', 'success')
+        editingEvent.value = null
+      } else {
+        showNotification(result.error || 'Error al actualizar el evento', 'error')
+      }
     } else {
-      eventsStore.addEvent(eventData)
-      showNotification('Evento creado exitosamente', 'success')
+      // ✅ Usar el groupId seleccionado para crear el evento
+      result = await eventsStore.addEvent(eventData, eventForm.groupId)
+      if (result.success) {
+        showNotification('Evento creado exitosamente', 'success')
+      } else {
+        showNotification(result.error || 'Error al crear el evento', 'error')
+      }
     }
 
-    // Limpiar formulario
-    Object.keys(eventForm).forEach(key => {
-      eventForm[key as keyof typeof eventForm] = ''
-    })
+    // Limpiar formulario solo si fue exitoso
+    if (result.success) {
+      Object.keys(eventForm).forEach(key => {
+        eventForm[key as keyof typeof eventForm] = ''
+      })
+    }
 
   } catch (error) {
     showNotification('Error al guardar el evento', 'error')
@@ -351,16 +421,21 @@ const editEvent = (event: Event) => {
   eventForm.time = event.time
   eventForm.location = event.location
   eventForm.category = event.category
+  eventForm.groupId = event.groupId || '' // ✅ Copiar el groupId del evento
   
   // Scroll al formulario
   document.querySelector('form')?.scrollIntoView({ behavior: 'smooth' })
   showNotification('Evento cargado para edición', 'info')
 }
 
-const deleteEvent = (eventId: string) => {
+const deleteEvent = async (eventId: string) => {
   if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
-    eventsStore.deleteEvent(eventId)
-    showNotification('Evento eliminado exitosamente', 'success')
+    const result = await eventsStore.deleteEvent(eventId)
+    if (result.success) {
+      showNotification('Evento eliminado exitosamente', 'success')
+    } else {
+      showNotification(result.error || 'Error al eliminar el evento', 'error')
+    }
   }
 }
 
@@ -374,7 +449,8 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString('es-ES', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC' // ✅ Forzar UTC para evitar conversión de zona horaria
   })
 }
 

@@ -1,19 +1,48 @@
-// Modelo de eventos culturales
+// Modelo de Eventos
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
 
 export const Event = sequelize.define("Event", {
-  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
-  title: { type: DataTypes.STRING(120), allowNull: false },
-  description: { type: DataTypes.TEXT, allowNull: true },
-  category: { type: DataTypes.STRING(60), allowNull: false },
-  groupId: { type: DataTypes.UUID, allowNull: false },
-  location: { type: DataTypes.STRING(160), allowNull: false },
-  startAt: { type: DataTypes.DATE, allowNull: false },
-  endAt: { type: DataTypes.DATE, allowNull: false },
-  visibility: { type: DataTypes.ENUM("public", "members", "private"), defaultValue: "public" },
-  ticketUrl: { type: DataTypes.STRING, allowNull: true },
-  publishAt: { type: DataTypes.DATE, allowNull: true }
+  id: { 
+    type: DataTypes.INTEGER, 
+    primaryKey: true, 
+    autoIncrement: true,
+    field: "ID"
+  },
+  titulo: { 
+    type: DataTypes.TEXT, 
+    allowNull: false
+  },
+  descripcion: { 
+    type: DataTypes.TEXT, 
+    allowNull: false,
+    field: "descripcion "
+  },
+  fechaEvento: { 
+    type: DataTypes.DATE, 
+    allowNull: false,
+    field: "fecha_evento"
+  },
+  ubicacion: { 
+    type: DataTypes.TEXT, 
+    allowNull: false
+  },
+  idGrupo: { 
+    type: DataTypes.INTEGER, 
+    allowNull: false,
+    field: "Id_grupo"
+  },
+  enlaceBoleteria: { 
+    type: DataTypes.TEXT, 
+    allowNull: true,
+    field: "enlaca_boleteria"
+  },
+  urlImagen: { 
+    type: DataTypes.TEXT, 
+    allowNull: false,
+    field: "url_imagen"
+  }
 }, {
-  tableName: "events"
+  tableName: "Eventos",
+  timestamps: false
 });

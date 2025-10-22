@@ -31,8 +31,22 @@ export async function updateGroupCtrl(req, res, next) {
   try {
     const { value, error } = updateGroupSchema.validate(req.body);
     if (error) throw createError(400, error.message);
-    const g = await svc.updateGroup(req.params.groupId, value);
+    
+    // Obtener el grupo actual para validar permisos
+    const existingGroup = await svc.getGroup(req.params.groupId);
+    if (!existingGroup) throw createError(404, "Grupo no encontrado");
+    
+    // Si el usuario es líder cultural (Lcultural), solo puede actualizar su propio grupo
+    if (req.user.role === 'Lcultural' && existingGroup.idLider !== req.user.id) {
+      throw createError(403, "No tienes permisos para actualizar este grupo");
+    }
+    
+    // Obtener el rol del usuario (puede ser 'administrador', 'Lcultural', o 'usuario')
+    const userRole = req.user?.rol?.nombreRol || req.user?.role || 'usuario';
+    
+    const g = await svc.updateGroup(req.params.groupId, value, userRole);
     if (!g) throw createError(404, "Grupo no encontrado");
+    
     res.json(g);
   } catch (err) { next(err); }
 }

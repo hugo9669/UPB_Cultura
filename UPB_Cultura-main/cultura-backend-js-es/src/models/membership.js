@@ -1,13 +1,30 @@
-// Modelo de membresías (usuario pertenece a grupo con un rol)
+// Modelo de Miembros de Grupo
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
 
 export const Membership = sequelize.define("Membership", {
-  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
-  userId: { type: DataTypes.UUID, allowNull: false },
-  groupId: { type: DataTypes.UUID, allowNull: false },
-  role: { type: DataTypes.ENUM("coordinator", "leader", "member"), defaultValue: "member" }
+  id: { 
+    type: DataTypes.INTEGER, 
+    primaryKey: true, 
+    autoIncrement: true,
+    field: "ID"
+  },
+  idUsuario: { 
+    type: DataTypes.INTEGER, 
+    allowNull: false,
+    field: "Id_usuario"
+  },
+  idGrupo: { 
+    type: DataTypes.INTEGER, 
+    allowNull: false,
+    field: "Id_grupo"
+  },
+  fechaUnion: { 
+    type: DataTypes.DATEONLY, 
+    allowNull: false,
+    field: "fecha_union"
+  }
 }, {
-  tableName: "memberships",
-  indexes: [{ unique: true, fields: ["userId", "groupId"] }]
+  tableName: "Miembros_Grupo",
+  timestamps: false
 });

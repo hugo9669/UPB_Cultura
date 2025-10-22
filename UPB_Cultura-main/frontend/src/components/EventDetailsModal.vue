@@ -15,6 +15,10 @@
       
       <div class="space-y-3">
         <p>
+          <span class="font-semibold">Grupo Cultural:</span> 
+          <span class="text-gray-900">{{ event.groupName }}</span>
+        </p>
+        <p>
           <span class="font-semibold">Categoría:</span> 
           <span :class="`text-${event.categoryColor}-600`">{{ event.category }}</span>
         </p>
@@ -32,18 +36,12 @@
         </p>
       </div>
       
-      <div class="mt-6 flex justify-end space-x-3">
+      <div class="mt-6 flex justify-end">
         <button 
           @click="$emit('close')"
-          class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300"
+          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
         >
           Cerrar
-        </button>
-        <button 
-          @click="handleRegister"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
-        >
-          Registrarse
         </button>
       </div>
     </div>
@@ -59,20 +57,21 @@ defineProps<{
 
 defineEmits<{
   close: []
-  register: [event: Event]
 }>()
 
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-
-const handleRegister = () => {
-  // Emitir evento de registro
-  // En un componente padre, esto se manejaría
+  // dateString viene como "2025-10-29"
+  // Parsear directamente sin usar Date object para evitar problemas de timezone
+  const [year, month, day] = dateString.split('-')
+  
+  const monthNames = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ]
+  
+  const monthIndex = parseInt(month) - 1
+  const monthName = monthNames[monthIndex]
+  
+  return `${parseInt(day)} de ${monthName} de ${year}`
 }
 </script>

@@ -53,10 +53,34 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminView.vue'),
+      meta: { requiresAuth: true, requiresRole: 'administrador' }
+    },
+    {
+      path: '/usuario',
+      name: 'usuario',
+      component: () => import('../views/UserView.vue'),
+      meta: { requiresAuth: true, requiresRole: 'usuario' }
+    },
+    {
+      path: '/lider',
+      name: 'lider',
+      component: () => import('../views/LiderView.vue'),
+      meta: { requiresAuth: true, requiresRole: 'Lcultural' }
+    },
+    {
       path: '/eventos-gestion',
       name: 'events-management',
       component: () => import('../views/EventsManagementView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/reportes',
+      name: 'reports',
+      component: () => import('../views/ReportsView.vue'),
+      meta: { requiresAuth: true, requiresRole: 'administrador' }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -76,9 +100,39 @@ router.beforeEach((to, from, next) => {
     return
   }
   
+  // Si la ruta requiere un rol específico
+  if (to.meta.requiresRole && authStore.isLoggedIn) {
+    const userRole = authStore.user?.role
+    const requiredRole = to.meta.requiresRole as string
+    
+    if (userRole !== requiredRole) {
+      // Redirigir según el rol del usuario
+      if (userRole === 'administrador') {
+        next('/admin')
+      } else if (userRole === 'usuario') {
+        next('/usuario')
+      } else if (userRole === 'Lcultural') {
+        next('/lider')
+      } else {
+        next('/')
+      }
+      return
+    }
+  }
+  
   // Si la ruta debe ocultarse para usuarios autenticados
   if (to.meta.hideForAuth && authStore.isLoggedIn) {
-    next('/dashboard')
+    // Redirigir según el rol
+    const userRole = authStore.user?.role
+    if (userRole === 'administrador') {
+      next('/admin')
+    } else if (userRole === 'usuario') {
+      next('/usuario')
+    } else if (userRole === 'Lcultural') {
+      next('/lider')
+    } else {
+      next('/dashboard')
+    }
     return
   }
   

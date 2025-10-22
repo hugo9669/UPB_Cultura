@@ -1,18 +1,45 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <div class="mx-auto h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header con botón de volver -->
+    <div class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between">
+          <button
+            @click="goToHome"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition duration-300"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver al inicio
+          </button>
+          <span class="text-gray-700 font-semibold">UPB Cultura</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido del login centrado -->
+    <div class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-md w-full space-y-8">
+        <div>
+        <div class="mx-auto h-16 w-24">
+          <svg width="96" height="64" viewBox="0 0 96 64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="upbLoginGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#E91E63;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#9C27B0;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#673AB7;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <!-- Fondo con gradiente -->
+            <rect width="96" height="64" rx="8" fill="url(#upbLoginGradient)"/>
+            <!-- Texto UPB -->
+            <text x="48" y="44" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#E8E0F5" text-anchor="middle">UPB</text>
           </svg>
         </div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Inicia Sesión
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Accede al panel de coordinadores de UPB Cultura
-        </p>
       </div>
       
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
@@ -64,27 +91,6 @@
           </div>
         </div>
 
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <input
-              id="remember-me"
-              v-model="form.remember"
-              name="remember-me"
-              type="checkbox"
-              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-              Recordarme
-            </label>
-          </div>
-
-          <div class="text-sm">
-            <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div>
-        </div>
-
         <div>
           <button
             type="submit"
@@ -99,17 +105,10 @@
             </span>
             {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
           </button>
-        </div>
-
-        <!-- Credenciales de prueba -->
-        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <h4 class="text-sm font-medium text-yellow-800 mb-2">Credenciales de Prueba:</h4>
-          <p class="text-xs text-yellow-700">
-            <strong>Email:</strong> admin@upb.edu.co<br>
-            <strong>Contraseña:</strong> admin123
-          </p>
+          <p v-if="formError" class="mt-3 text-sm text-red-600 text-center">{{ formError }}</p>
         </div>
       </form>
+      </div>
     </div>
   </div>
 </template>
@@ -126,8 +125,7 @@ const { showNotification } = useNotifications()
 
 const form = reactive({
   email: '',
-  password: '',
-  remember: false
+  password: ''
 })
 
 const errors = reactive({
@@ -137,6 +135,7 @@ const errors = reactive({
 
 const isLoading = ref(false)
 const showPassword = ref(false)
+const formError = ref('')
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
@@ -175,27 +174,44 @@ const isValidEmail = (email: string) => {
   return emailRegex.test(email)
 }
 
+const goToHome = () => {
+  router.push('/')
+}
+
 const handleLogin = async () => {
   if (!validateForm()) {
     return
   }
 
   isLoading.value = true
+  formError.value = ''
 
   try {
-    // Simular delay de autenticación
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const result = await authStore.login(form.email, form.password)
     
-    const success = authStore.login(form.email, form.password)
-    
-    if (success) {
+    if (result.success) {
       showNotification('¡Inicio de sesión exitoso!', 'success')
-      router.push('/dashboard')
+      
+      // Redirigir según el rol del usuario
+      const userRole = authStore.user?.role
+      
+      if (userRole === 'administrador') {
+        router.push('/admin')
+      } else if (userRole === 'usuario') {
+        router.push('/usuario')
+      } else if (userRole === 'Lcultural') {
+        router.push('/lider')
+      } else {
+        router.push('/dashboard')
+      }
     } else {
-      showNotification('Credenciales incorrectas', 'error')
+      const msg = result.error || 'Usuario o contraseña incorrecto'
+      formError.value = msg
+      showNotification(msg, 'error')
     }
   } catch (error) {
-    showNotification('Error al iniciar sesión', 'error')
+    formError.value = 'Usuario o contraseña incorrecto'
+    showNotification('Usuario o contraseña incorrecto', 'error')
   } finally {
     isLoading.value = false
   }

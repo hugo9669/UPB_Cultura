@@ -1,6 +1,19 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-8 md:py-12">
+      <!-- Botón Volver al Panel (visible solo cuando está logueado) -->
+      <div v-if="authStore.isLoggedIn" class="mb-6">
+        <button
+          @click="goToPanel"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 shadow-md"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Volver al Panel
+        </button>
+      </div>
+      
       <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center">
         Grupos Culturales
       </h2>
@@ -58,11 +71,7 @@
                 <span class="font-medium">{{ group.members }}</span>
               </div>
               <div class="flex justify-between">
-                <span>Fundado:</span>
-                <span class="font-medium">{{ group.founded }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Director:</span>
+                <span>Líder:</span>
                 <span class="font-medium">{{ group.director }}</span>
               </div>
             </div>
@@ -73,11 +82,19 @@
               >
                 Ver Perfil
               </button>
+              <!-- Botón para Usuarios: Solicitar Unirse o Ya Miembro -->
               <button 
-                @click="contactGroup(group)"
-                class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300"
+                v-if="authStore.isLoggedIn && authStore.user?.role === 'usuario'"
+                @click="requestToJoin(group)"
+                :disabled="isUserMember(group.id)"
+                :class="[
+                  'px-4 py-2 rounded-full text-sm font-medium transition duration-300',
+                  isUserMember(group.id)
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                ]"
               >
-                Contactar
+                {{ isUserMember(group.id) ? 'Ya eres miembro' : 'Solicitar Unirse' }}
               </button>
             </div>
           </div>
@@ -99,33 +116,122 @@
       v-if="selectedGroup"
       :group="selectedGroup"
       @close="selectedGroup = null"
-      @contact="contactGroup"
+      @deleted="handleGroupDeleted"
+    />
+
+    <!-- Modal de solicitud de membresía (para usuarios) -->
+    <JoinGroupModal
+      :is-open="showJoinModal"
+      :group-id="groupToJoin?.id || ''"
+      :group-name="groupToJoin?.name || ''"
+      @close="closeJoinModal"
+      @success="handleJoinSuccess"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useGroupsStore } from '../stores/groups'
+import { useAuthStore } from '../stores/auth'
 import { useNotifications } from '../composables/useNotifications'
+import { apiService } from '@/services/api'
 import GroupProfileModal from '../components/GroupProfileModal.vue'
+import JoinGroupModal from '../components/JoinGroupModal.vue'
 import type { Group } from '../stores/groups'
 
+const router = useRouter()
 const groupsStore = useGroupsStore()
+const authStore = useAuthStore()
 const { showNotification } = useNotifications()
 
 const selectedGroup = ref<Group | null>(null)
+const showJoinModal = ref(false)
+const groupToJoin = ref<Group | null>(null)
+const myGroupIds = ref<number[]>([])
 
 const searchGroups = () => {
   showNotification('Búsqueda realizada', 'info')
+}
+
+const goToPanel = () => {
+  const role = authStore.user?.role
+  
+  switch (role) {
+    case 'administrador':
+      router.push('/admin')
+      break
+    case 'Lcultural':
+      router.push('/lider')
+      break
+    case 'usuario':
+      router.push('/usuario')
+      break
+    default:
+      router.push('/')
+  }
 }
 
 const viewGroupProfile = (group: Group) => {
   selectedGroup.value = group
 }
 
-const contactGroup = (group: Group) => {
-  showNotification(`Redirigiendo a contacto con ${group.name}`, 'info')
-  // Aquí se podría implementar la lógica de contacto real
+const loadMyGroupIds = async () => {
+  if (!authStore.isLoggedIn || authStore.user?.role !== 'usuario') {
+    return
+  }
+  
+  try {
+    const response = await apiService.getMyMemberships()
+    if (response.data) {
+      myGroupIds.value = response.data.map((membership: any) => membership.group.id)
+    }
+  } catch (error: any) {
+    console.error('Error al cargar membresías:', error)
+  }
 }
+
+const isUserMember = (groupId: number): boolean => {
+  return myGroupIds.value.includes(groupId)
+}
+
+const requestToJoin = (group: Group) => {
+  // Verificar si el usuario ya es miembro del grupo
+  if (isUserMember(group.id)) {
+    showNotification('Ya eres miembro de este grupo cultural', 'info')
+    return
+  }
+  
+  groupToJoin.value = group
+  showJoinModal.value = true
+}
+
+const closeJoinModal = () => {
+  showJoinModal.value = false
+  groupToJoin.value = null
+}
+
+const handleJoinSuccess = () => {
+  // La solicitud fue enviada exitosamente
+  // El usuario recibirá una notificación cuando sea aprobada/rechazada
+  // Recargar los IDs de los grupos por si la solicitud fue aprobada automáticamente
+  loadMyGroupIds()
+}
+
+const handleGroupDeleted = () => {
+  // Recargar la lista de grupos después de eliminar
+  groupsStore.initializeGroups()
+  // También recargar los IDs de grupos del usuario si está logueado como usuario
+  if (authStore.isLoggedIn && authStore.user?.role === 'usuario') {
+    loadMyGroupIds()
+  }
+}
+
+onMounted(() => {
+  // Si es un usuario regular, cargar sus grupos
+  if (authStore.isLoggedIn && authStore.user?.role === 'usuario') {
+    loadMyGroupIds()
+  }
+})
 </script>
